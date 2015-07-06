@@ -1,0 +1,184 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package Grafica;
+
+
+import static com.sun.org.apache.xalan.internal.lib.ExsltDatetime.date;
+import static com.sun.org.apache.xalan.internal.lib.ExsltDatetime.date;
+import java.awt.Dimension;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.table.DefaultTableModel;
+
+/**
+ *
+ * @author Yanir
+ */
+
+
+    
+
+public class Tabla_Serv extends javax.swing.JFrame {
+
+    
+    
+    private Object data [][] ;
+    /**
+     * Creates new form NuevoServ
+     */
+    public Tabla_Serv() throws SQLException {
+        initComponents();
+        
+        Statement st = null; 
+       Connection con = null;
+       this.setMinimumSize(new Dimension(800, 600)); 
+        try {
+           try {
+               Class.forName("com.mysql.jdbc.Driver").newInstance();
+           } catch (InstantiationException ex) {
+               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
+           } catch (IllegalAccessException ex) {
+               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
+           }
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
+
+            st  = con.createStatement();
+            
+                
+            
+            ResultSet rs = null;
+            
+            rs = st.executeQuery(" select count(Servicios_idServicios) as cantidad " +
+                                 " from inventario_has_servicios ;");
+            rs.beforeFirst();
+            while (rs.next())
+            {
+                data = new Object [rs.getInt("cantidad")] [4];
+            }
+             
+            
+            rs = st.executeQuery("Select idServicios_auto, Descripcion, servicios2.Inventario_Marca, servicios2.Inventario_Producto, Automovil_Placa, Automovil_Model, Cantidad " +
+                                "from servicios_has_automovil, tipo_servicio, " +
+                                "(Select Servicios_idServicios, Tipo_Servicio_idTipo_Servicio, Cantidad, ser_inv.Inventario_Marca, ser_inv.Inventario_Producto " +
+                                "from inventario_has_servicios as ser_inv  " +
+                                "inner join inventario_has_tipo_servicio as inv_ser " +
+                                "on ser_inv.Inventario_Producto = inv_ser.Inventario_Producto " +
+                                "and ser_inv.Inventario_Marca = inv_ser.Inventario_Marca ) as servicios2 " +
+                                "where idServicios_auto = servicios2.Servicios_idServicios and idTipo_Servicio = servicios2.Tipo_Servicio_idTipo_Servicio ;");
+        
+             rs.beforeFirst();
+            for(int i = 0 ; rs.next() ; i++)
+            {
+                data [i] [0] = rs.getString("idServicios_auto")+ " - "  + rs.getString("Descripcion");
+                System.out.println(" data [i] [0] :" + data [i] [0]);
+                data [i] [1] = rs.getString("Automovil_Model")+ " - "  + rs.getString("Automovil_Placa");
+                System.out.println(" data [i] [1] :" + data [i] [1]);
+                data [i] [2] = rs.getString("servicios2.Inventario_Producto")+ " - "  + rs.getString("servicios2.Inventario_Marca");
+                System.out.println(" data [i] [2] :" + data [i] [2]);
+                data [i] [3] = rs.getFloat("Cantidad") ;
+                System.out.println(" data [i] [3] :" + data [i] [3]);
+            }
+            
+             String[] columnNames = {"Servicio.","Camión.", "Producto.", "Cantidad."}; 
+             final JTable table = new JTable(data, columnNames){
+                          public boolean isCellEditable (int row, int column)
+                            {
+                                return false;
+                            }
+                    }; 
+             table.setPreferredScrollableViewportSize(new Dimension(table.getSize()));
+             JScrollPane scrollpane = new JScrollPane(table);
+             scrollpane.setPreferredSize(new Dimension(this.getSize()));
+             this.add(scrollpane);
+            
+    }
+
+    
+
+
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Inventario.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Inventario.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Inventario.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Inventario.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                  try {
+                    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());  
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InstantiationException ex) {
+                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (UnsupportedLookAndFeelException ex) {
+                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+            }
+        });
+    }
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // End of variables declaration//GEN-END:variables
+}
