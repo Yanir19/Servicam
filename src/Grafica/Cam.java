@@ -6,6 +6,7 @@
 
 package Grafica;
 
+import Objetos.manejador_bd;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.ScrollPane;
@@ -34,86 +35,71 @@ public class Cam extends javax.swing.JFrame {
     
     
     private JTabbedPane pestana = new JTabbedPane();
-  
+    private static manejador_bd BD; 
+    
+    
+    
+    
     public Cam() throws ClassNotFoundException, InstantiationException, SQLException {
         initComponents();
+        
         this.setTitle("Camiones.");
         this.setExtendedState(MAXIMIZED_BOTH);   
-         this.setMinimumSize(new Dimension(800, 600)); 
-       Object[][] data;  
-     
-       Statement st = null; 
-       Connection con = null;
+        this.setMinimumSize(new Dimension(800, 600)); 
+        BD = new manejador_bd();
+        Object[][] data;      
+        ResultSet rs = null;
+        int i=0;
+        int aux=0;
+        
+        rs = BD.st.executeQuery("SELECT * FROM automovil");
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        Dimension tamano = tk.getScreenSize();
+        pestana.setPreferredSize(new Dimension(tamano));
        
-        try {
-           try {
-               Class.forName("com.mysql.jdbc.Driver").newInstance();
-           } catch (InstantiationException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           } catch (IllegalAccessException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
+        
+        while (rs.next())
+        {
+            i++;
         }
         
-            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
+        aux=i;
+        i=0;
+        data = new Object [aux] [4];
+        rs.beforeFirst();
+        
+        while (rs.next())
+        {
+            data [i][0]= rs.getString("placa");
+            data [i][1]= rs.getString("Model");
+            data [i][2]= rs.getString("chofer");
+            data [i][3] = rs.getInt("Km");
+            i++;
+        }
 
-            st  = con.createStatement();
-            
-                
-            
-            ResultSet rs = null;
-                    
-            rs = st.executeQuery("SELECT * FROM automovil");
-            Toolkit tk = Toolkit.getDefaultToolkit();
-            Dimension tamano = tk.getScreenSize();
-            pestana.setPreferredSize(new Dimension(tamano));
-            int i=0;
-            int aux=0;
-            while (rs.next())
-            {
-                
-             i++;
-            }
-            aux=i;
-            i=0;
-             data = new Object [aux] [4];
-            
-            rs.beforeFirst();
-            while (rs.next())
-            {
-             data [i][0]= rs.getString("placa");
-             data [i][1]= rs.getString("Model");
-             data [i][2]= rs.getString("chofer");
-             data [i][3] = rs.getInt("Km");
-             i++;
-            }
-         
-            
-            rs.close();
+
+        rs.close();
   
-          Panelcam[] panel = new Panelcam [aux];
-          for (i=0; i!=aux;i++){
-              
+        Panelcam[] panel = new Panelcam [aux];
+        
+        for (i=0; i!=aux;i++){
           panel [i] = new Panelcam(data,i);
           panel [i].setSize(new Dimension(300, 300));
           panel [i].setMaximumSize(new Dimension(300, 300));
-           panel [i].setMinimumSize(new Dimension(300, 300));
+          panel [i].setMinimumSize(new Dimension(300, 300));
           pestana.addTab ((String) data[i][1], panel[i]);
-          }
-          ScrollPane scrollpane = new ScrollPane();
-          scrollpane.setPreferredSize(new Dimension(tamano));
-          scrollpane.setMaximumSize(new Dimension(300, 300));
-          scrollpane.setMinimumSize(new Dimension(300, 300));
-          scrollpane.add(pestana);
-      
-          this.setLayout(new BorderLayout());
-          this.setContentPane(scrollpane);
-          this.setLocationRelativeTo(null);
+        }
+        
+        ScrollPane scrollpane = new ScrollPane();
+        scrollpane.setPreferredSize(new Dimension(tamano));
+        scrollpane.setMaximumSize(new Dimension(300, 300));
+        scrollpane.setMinimumSize(new Dimension(300, 300));
+        scrollpane.add(pestana);
 
-        
-        
+        this.setLayout(new BorderLayout());
+        this.setContentPane(scrollpane);
+        this.setLocationRelativeTo(null);
+
     }
 
     /**

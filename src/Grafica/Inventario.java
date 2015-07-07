@@ -5,12 +5,10 @@
  */
 package Grafica;
 
+import Objetos.manejador_bd;
 import java.awt.Dimension;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,9 +24,8 @@ import javax.swing.table.DefaultTableModel;
 public class Inventario extends javax.swing.JFrame {
      private String producto;
      private String marca;
-     private Statement st = null; 
-     private Connection con = null;
      private ResultSet rs = null;
+     private static manejador_bd BD;
      
      
     public void setProducto(String producto) {
@@ -41,25 +38,17 @@ public class Inventario extends javax.swing.JFrame {
     /**
      * Creates new form Inventario2
      */
+    
+    
+    
+    
+    
     public Inventario() throws SQLException {
        this.setTitle("Inventario.");
        this.setMinimumSize(new Dimension(800, 600)); 
-        initComponents();
+       initComponents();
        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        try {
-           try {
-               Class.forName("com.mysql.jdbc.Driver").newInstance();
-           } catch (InstantiationException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           } catch (IllegalAccessException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-         System.out.print("hasta aqui vamos bien");    
-        con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-        st  = con.createStatement();
+       BD = new manejador_bd();
        
         Inventario_total();
      
@@ -73,7 +62,7 @@ public class Inventario extends javax.swing.JFrame {
         int i=0;
         Object data [][];
         Panel.removeAll();
-        rs = st.executeQuery("select count(*) as cantidad from inventario ; ");
+        rs = BD.st.executeQuery("select count(*) as cantidad from inventario ; ");
         
         while (rs.next())
         {
@@ -83,7 +72,7 @@ public class Inventario extends javax.swing.JFrame {
   
         data = new Object [i] [9];
         
-        rs = st.executeQuery("select * , (Cantidad - Sugerido) as total from inventario ; ");    
+        rs = BD.st.executeQuery("select * , (Cantidad - Sugerido) as total from inventario ; ");    
         rs.beforeFirst();
 
         
@@ -130,7 +119,7 @@ public class Inventario extends javax.swing.JFrame {
           int i = 0;
           SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
         Panel.removeAll();
-        rs = st.executeQuery("select count(*) as cantidad from historico_inventario ; ");
+        rs = BD.st.executeQuery("select count(*) as cantidad from historico_inventario ; ");
         
         while (rs.next())
         {
@@ -140,7 +129,7 @@ public class Inventario extends javax.swing.JFrame {
   
         data = new Object [i] [9];
         
-        rs = st.executeQuery("select * , (Cantidad - Sugerido) as total from historico_inventario " +
+        rs = BD.st.executeQuery("select * , (Cantidad - Sugerido) as total from historico_inventario " +
                              "where Inventario_Producto = '"+producto+"' and Inventario_Marca = '"+marca+"'  ; ");    
         rs.beforeFirst();
 

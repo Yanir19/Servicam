@@ -6,9 +6,8 @@
 
 package Grafica;
 
+import Objetos.manejador_bd;
 import java.awt.BorderLayout;
-import java.awt.Checkbox;
-import java.awt.Dimension;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +28,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
-import static javax.swing.UIManager.getString;
 import javax.swing.UnsupportedLookAndFeelException;
 
 /**
@@ -43,11 +42,10 @@ public class Serviciosasociados extends javax.swing.JFrame {
     
     private JButton btn = new JButton ("Agregar");
     private Panel pane = new Panel();
-    private Statement st = null;
-    private Connection con = null;
+    private static manejador_bd BD;
     private ResultSet rs = null;
     public boolean bandera =false;
-    
+    private static ArrayList lista = new ArrayList ();
     
     public boolean getFlag() {
         return bandera;
@@ -57,54 +55,43 @@ public class Serviciosasociados extends javax.swing.JFrame {
         this.bandera = flag;
         
     }
+    
    
     public Serviciosasociados() throws SQLException {
         initComponents();
         this.setTitle("Servicios asociados."); 
+        BD = new manejador_bd();
+        
     }
     
-    public void  AgregarProducto (final int idinv , final String Producto, final String Marca) throws SQLException{
+    public ArrayList  AgregarProducto (final int idinv , final String Producto, final String Marca, ArrayList argumento_lista) throws SQLException{
         
-        Statement st = null; 
-        Connection con = null;
+        
         int cont =0;
-        
+        this.lista = argumento_lista;
         System.out.println("Prodcuto : " + Producto);
         System.out.println("Marca : " + Marca);
         
-        try {
-           try {
-               Class.forName("com.mysql.jdbc.Driver").newInstance();
-           } catch (InstantiationException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           } catch (IllegalAccessException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-
-            st  = con.createStatement();
+       
             
                 
             
             ResultSet rs = null;
             
             
-                             rs=st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " + 
+                             rs=BD.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " + 
                                     " FROM tipo_servicio ,Inventario_has_Tipo_Servicio as ta"+
                                     " WHERE ta.Inventario_Producto = '"+ Producto  +"' and  ta.Inventario_Marca = '"+ Marca  +"' AND idTipo_Servicio  = ta.Tipo_Servicio_idTipo_Servicio; ");
                             
                             rs.beforeFirst();
-                             for (cont = 0; rs.next(); cont++);
+                            
+                            for (cont = 0; rs.next(); cont++);
                                  
                             
                             final Object id2 [] [] = new Object [4] [cont];
                             
                             
-                               rs=st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " + 
+                               rs=BD.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " + 
                                     " FROM tipo_servicio , Inventario_has_Tipo_Servicio as ta"+
                                     " WHERE ta.Inventario_Producto = '"+ Producto  +"' and  ta.Inventario_Marca = '"+ Marca  +"' AND idTipo_Servicio  = ta.Tipo_Servicio_idTipo_Servicio; ");
                                
@@ -120,22 +107,19 @@ public class Serviciosasociados extends javax.swing.JFrame {
                              
                              final int aux = cont;
                              
-                              rs=st.executeQuery("SELECT Descripcion FROM tipo_servicio ;");
+                              rs=BD.st.executeQuery("SELECT Descripcion FROM tipo_servicio ;");
                               rs.beforeFirst();
                               
                               cont = 0;
                               
-                            while (rs.next())
-                            {
-                             cont++;
-                            }
+                            for (cont = 0; rs.next(); cont++);
 
                             final  JCheckBox checkBox[] = new JCheckBox [cont] ;
                             final  JLabel tipo [] = new JLabel [cont];
                             final int id []= new int [cont];
                             
                             
-                             rs=st.executeQuery("SELECT idTipo_Servicio, Descripcion FROM tipo_servicio ;");
+                             rs=BD.st.executeQuery("SELECT idTipo_Servicio, Descripcion FROM tipo_servicio ;");
                                 rs.beforeFirst();
 
                             int y= 20;
@@ -153,15 +137,20 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                 this.add(checkBox[i]);
                                 
                                 
-                                if(aux>0){
+                                if(aux>0 ){
                                 if (id[i] <=  (int) id2[0][aux-1]){
                                     for (int k = 0; k<aux; k++){
-                                        if (id [i] == (int ) id2[0][k]){
+                                        if (id [i] == (int ) id2[0][k] ){
                                            checkBox [i].setSelected(true);
-                                        }
-                                                  
+                                        }        
                                     }
                                 }
+                                }else{
+                                    for (int k = 0; k<cont; k++){
+                                        if (lista.contains(id [i])){
+                                           checkBox [i].setSelected(true);
+                                        }        
+                                    }
                                 }
                                 
                                 y+=30;
@@ -183,79 +172,51 @@ public class Serviciosasociados extends javax.swing.JFrame {
                         @Override
                         public void actionPerformed(ActionEvent e) {
 
-                            Statement st = null; 
-                            Connection con = null;
-
-
-                            try {
-                               try {
-                                   Class.forName("com.mysql.jdbc.Driver").newInstance();
-                               } catch (InstantiationException ex) {
-                                   Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                               } catch (IllegalAccessException ex) {
-                                   Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                               }
-                            } catch (ClassNotFoundException ex) {
-                                Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-
-                            try {
-                                con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-                            } catch (SQLException ex) {
-                                Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-
-                            try {
-                                st  = con.createStatement();
-                            } catch (SQLException ex) {
-                                Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
-                            }
+                            
+                            lista.clear();
                             boolean flag2 = false;
                             int flag = 0;
                             System.out.println("Esto es F " + f);
                                     for (int j=0; j<f; j++ ){
-                                       System.out.println("Esto es J " + j);
+                                       System.out.println("Esto es J: " + j);
                                         if ( checkBox[j].isSelected() ){
                                             flag = 1;
                                             System.out.println("Entre por aqui ");
-                                           if (aux > 0){
-                                            if (id[j] <=  (int) id2[0][aux-1]){
-                                                for (int k = 0; k<aux; k++){
-                                                    if (id [j] == (int ) id2[0][k]){
-                                                        flag = 2 ;
-                                                               
+                                            if (aux > 0){
+                                                if (id[j] <=  (int) id2[0][aux-1]){
+                                                    for (int k = 0; k<aux; k++){
+                                                        if (id [j] == (int ) id2[0][k]){
+                                                            flag = 2 ;
+
+                                                        }
+
                                                     }
-                                                  
+
+                                                }else{
+                                                    flag  = 0;
+                                                     System.out.println("Estoy entrando aqui ");
                                                 }
-                                            
+                                            }   
                                         }else{
-                                            flag  = 0;
-                                             System.out.println("Estoy entrando aqui ");
-                                        }
-                                        }   
+                                            flag = 0;
                                         }
                                   
                                         System.out.println("Este es flag : " + flag);
                                             if (flag == 1){
                                                     
                                                 flag2= true;
-                                                try {
-                                                    System.out.println("id : " + idinv);
-                                                    System.out.println("Producto : " + Producto);
-                                                    System.out.println("Marca : " + Marca );
-                                                    st.execute("INSERT INTO Inventario_has_Tipo_Servicio"
-                                                            + " VALUES ( "+idinv+" , '"+ Producto+"' , '"+ Marca+"' , "+id[j]+" );");
-                                                } catch (SQLException ex) {
-                                                    Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
-                                                }
+                                                    System.out.println("Estoy en el elemento: " + j + "id : " + id[j] );
+                                      
+                                                    lista.add((int) id[j]);
+                                                 
                                                 
                                             }else{
                                                     
                                                 if (flag == 0){
                                                     try {
-                                                        st.execute(" DELETE FROM servi_cam.Inventario_has_Tipo_Servicio"
+                                                        BD.st.execute(" DELETE FROM servi_cam.Inventario_has_Tipo_Servicio"
                                                                 + " WHERE Tipo_Servicio_idTipo_Servicio = "+id[j]+ " and Inventario_Producto  = '"+ Producto +"' and  Inventario_Marca = '"+ Marca  +"' ;");
-
+                                                                
                                                     } catch (SQLException ex) {
                                                         Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
                                                     }
@@ -264,6 +225,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                  }
                                     
                             if (flag2)
+                                
                             dispose();
                             else {
                                 JOptionPane.showMessageDialog(null, "Debe seleccionar al menos 1 tipo de servicio. " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
@@ -272,37 +234,20 @@ public class Serviciosasociados extends javax.swing.JFrame {
                         
                     });
                             
-            
+    return lista;
    }
     
     
     public void AgregarServicioCamion (final String Placa, final String Modelo) throws SQLException{
          
-        Statement st = null; 
-        Connection con = null;
         int cont =0;
         
-        try {
-           try {
-               Class.forName("com.mysql.jdbc.Driver").newInstance();
-           } catch (InstantiationException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           } catch (IllegalAccessException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-
-            st  = con.createStatement();
-            
+       
                 
             
             ResultSet rs = null;
             
-                        rs=st.executeQuery("SELECT Descripcion FROM tipo_servicio ;");
+                        rs=BD.st.executeQuery("SELECT Descripcion FROM tipo_servicio ;");
                          rs.beforeFirst();
 
                             while (rs.next())
@@ -316,7 +261,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                     final JSpinner spin [] = new JSpinner [cont];
                     final JComboBox combo [] = new JComboBox[cont];
                     final int id []= new int [cont];
-                     rs=st.executeQuery("SELECT idTipo_Servicio, Descripcion FROM tipo_servicio ;");
+                     rs=BD.st.executeQuery("SELECT idTipo_Servicio, Descripcion FROM tipo_servicio ;");
                         rs.beforeFirst();
 
                             int y= 20;
@@ -346,7 +291,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                             final int f= cont;
 
                             
-                            rs=st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " + 
+                            rs=BD.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " + 
                                     " FROM tipo_servicio, automovil ,tipo_servicio_has_automovil as ta"+
                                     " WHERE ta.Automovil_Placa = '"+ Placa +"' AND ta.Automovil_Model = '"+ Modelo +"' AND idTipo_Servicio  = ta.Tipo_Servicio_idTipo_Servicio; ");
                             
@@ -357,7 +302,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                             final Object id2 [] [] = new Object [4] [cont];
                             
                             
-                            rs=st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion, Tiempo, ta.Km " + 
+                            rs=BD.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion, Tiempo, ta.Km " + 
                                     " FROM tipo_servicio, automovil ,tipo_servicio_has_automovil as ta"+
                                     " WHERE ta.Automovil_Placa = '"+ Placa +"' AND ta.Automovil_Model = '"+ Modelo +"' AND idTipo_Servicio  = ta.Tipo_Servicio_idTipo_Servicio; ");
                             
@@ -425,33 +370,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                         @Override
                         public void actionPerformed(ActionEvent e) {
 
-                            Statement st = null; 
-                            Connection con = null;
-
-
-                            try {
-                               try {
-                                   Class.forName("com.mysql.jdbc.Driver").newInstance();
-                               } catch (InstantiationException ex) {
-                                   Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                               } catch (IllegalAccessException ex) {
-                                   Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                               }
-                            } catch (ClassNotFoundException ex) {
-                                Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-
-                            try {
-                                con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-                            } catch (SQLException ex) {
-                                Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-
-                            try {
-                                st  = con.createStatement();
-                            } catch (SQLException ex) {
-                                Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
-                            }
+                            
                             boolean flag2 = false;
                             int flag = 0;
                             System.out.println("f : " + f);
@@ -507,12 +426,12 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                                         if (combo [j].getSelectedItem() == "Días" || combo [j].getSelectedItem() == "Meses"){
                                                         System.out.println(j);
                                                             System.out.println("hablame");
-                                                        st.execute("INSERT INTO tipo_servicio_has_automovil"
+                                                        BD.st.execute("INSERT INTO tipo_servicio_has_automovil"
                                                                 + "  (Tipo_Servicio_idTipo_Servicio,Automovil_Placa, Automovil_Model, Tiempo)"
                                                                 + " VALUES ("+id[j]+",'"+Placa+"','"+Modelo+"' ,'"+ tiempo +"');");
                                                 
                                                         }else{
-                                                            st.execute("INSERT INTO tipo_servicio_has_automovil"
+                                                            BD.st.execute("INSERT INTO tipo_servicio_has_automovil"
                                                                 + "  (Tipo_Servicio_idTipo_Servicio,Automovil_Placa, Automovil_Model, Km)"
                                                                 + " VALUES ("+id[j]+",'"+Placa+"','"+Modelo+"' ,'"+ (int) spin[j].getValue()+"');");
                                                            
@@ -523,7 +442,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                                 }else{
                                                     if (flag ==2){
                                                         try {
-                                                            st.execute("UPDATE tipo_servicio_has_automovil"
+                                                            BD.st.execute("UPDATE tipo_servicio_has_automovil"
                                                                     + " SET Km = '" + (int) spin[j].getValue() + "', Tiempo = NULL "
                                                                     + " WHERE Automovil_Placa = '"+ Placa +"' AND Automovil_Model = '"+ Modelo +"' AND Tipo_Servicio_idTipo_Servicio = '" +id [j] +"'; ");
                                                          
@@ -536,10 +455,10 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                                         if (flag == 3){
                                                             
                                                                   try {
-                                                            st.execute("UPDATE tipo_servicio_has_automovil"
+                                                            BD.st.execute("UPDATE tipo_servicio_has_automovil"
                                                                     + " SET Tiempo = '" + tiempo + "' , Km = NULL"
                                                                     + " WHERE Automovil_Placa = '"+ Placa +"' AND Automovil_Model = '"+ Modelo +"' AND Tipo_Servicio_idTipo_Servicio = '" +id [j] +"'; ");
-                                                            st.close();
+                                                            BD.st.close();
                                                         } catch (SQLException ex) {
                                                             Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
                                                         }
@@ -554,7 +473,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                             }else {
                                         
                                                 try {
-                                                    st.execute(" DELETE FROM servi_cam.tipo_servicio_has_automovil"
+                                                    BD.st.execute(" DELETE FROM servi_cam.tipo_servicio_has_automovil"
                                                             + " WHERE Tipo_Servicio_idTipo_Servicio ='"+id[j]+ "' and Automovil_Placa = '"+ Placa +"' AND Automovil_Model = '"+ Modelo +"';");
                                                   
                                                 } catch (SQLException ex) {
@@ -577,31 +496,12 @@ public class Serviciosasociados extends javax.swing.JFrame {
      
     public void AgregarServicioCamionNuevo (final String Placa, final String Modelo ,  final int Km, final Date fecha ) throws SQLException{
         
-        Statement st = null; 
-        Connection con = null;
         int cont =0;
         
-        try {
-           try {
-               Class.forName("com.mysql.jdbc.Driver").newInstance();
-           } catch (InstantiationException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           } catch (IllegalAccessException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-
-            st  = con.createStatement();
-            
-                
-            
+       
             ResultSet rs = null;
             
-                        rs=st.executeQuery("SELECT Descripcion FROM tipo_servicio ;");
+                        rs=BD.st.executeQuery("SELECT Descripcion FROM tipo_servicio ;");
                          rs.beforeFirst();
 
                             while (rs.next())
@@ -615,7 +515,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                     final JSpinner spin [] = new JSpinner [cont];
                     final JComboBox combo [] = new JComboBox[cont];
                     final int id []= new int [cont];
-                     rs=st.executeQuery("SELECT idTipo_Servicio, Descripcion FROM tipo_servicio ;");
+                     rs=BD.st.executeQuery("SELECT idTipo_Servicio, Descripcion FROM tipo_servicio ;");
                         rs.beforeFirst();
 
                             int y= 20;
@@ -653,33 +553,6 @@ public class Serviciosasociados extends javax.swing.JFrame {
                         @Override
                         public void actionPerformed(ActionEvent e) {
 
-                            Statement st = null; 
-                            Connection con = null;
-                            
-
-                            try {
-                               try {
-                                   Class.forName("com.mysql.jdbc.Driver").newInstance();
-                               } catch (InstantiationException ex) {
-                                   Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                               } catch (IllegalAccessException ex) {
-                                   Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                               }
-                            } catch (ClassNotFoundException ex) {
-                                Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-
-                            try {
-                                con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-                            } catch (SQLException ex) {
-                                Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-
-                            try {
-                                st  = con.createStatement();
-                            } catch (SQLException ex) {
-                                Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
-                            }
                             
                             boolean flag2 = false;
                             int flag = 0;
@@ -705,12 +578,12 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                                     
                                                     try {
                                                         if (combo [j].getSelectedItem() == "Días" || combo [j].getSelectedItem() == "Meses"){
-                                                        st.execute("INSERT INTO tipo_servicio_has_automovil"
+                                                        BD.st.execute("INSERT INTO tipo_servicio_has_automovil"
                                                                 + "  (Tipo_Servicio_idTipo_Servicio,Automovil_Placa, Automovil_Model, Tiempo)"
                                                                 + " VALUES ("+id[j]+",'"+Placa+"','"+Modelo+"' ,'"+ tiempo +"');");
                                                                
                                                         }else{
-                                                            st.execute("INSERT INTO tipo_servicio_has_automovil"
+                                                            BD.st.execute("INSERT INTO tipo_servicio_has_automovil"
                                                                 + "  (Tipo_Servicio_idTipo_Servicio,Automovil_Placa, Automovil_Model, Km)"
                                                                 + " VALUES ("+id[j]+",'"+Placa+"','"+Modelo+"' ,'"+ (int) spin[j].getValue()+"');");
                                                                 
@@ -735,7 +608,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                 System.out.println(Placa);
                                 System.out.println(Modelo);
                                 try {
-                                    rs = st.executeQuery("SELECT Tipo_Servicio_idTipo_Servicio " +
+                                    rs = BD.st.executeQuery("SELECT Tipo_Servicio_idTipo_Servicio " +
                                                           " FROM Tipo_Servicio_has_automovil AS ta " +
                                                           " WHERE ta.Automovil_Placa = '"+Placa+"' AND ta.Automovil_Model = '"+Modelo+"'  ;" );
                                      rs.beforeFirst();
@@ -749,7 +622,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                     Object id2 [] = new Object[cont];
                                     System.out.println("Esto es cont : " + cont);
                                 try {
-                                     rs = st.executeQuery("SELECT Tipo_Servicio_idTipo_Servicio " +
+                                     rs = BD.st.executeQuery("SELECT Tipo_Servicio_idTipo_Servicio " +
                                                           " FROM Tipo_Servicio_has_automovil AS ta " +
                                                           " WHERE ta.Automovil_Placa = '"+Placa+"' AND ta.Automovil_Model = '"+Modelo+"'  ;" );
                                     rs.beforeFirst();
@@ -758,7 +631,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                        id2[i] = rs.getInt("Tipo_Servicio_idTipo_Servicio");
 
                                        for (int i = 0; i<cont ; i++)
-                                      st.execute("INSERT INTO Servicios (Fecha,Costo,Km, Detalle) VALUES ('"+formato.format(fecha)+"', 0 ,'"+ Km +"' , ' ') ;");
+                                      BD.st.execute("INSERT INTO Servicios (Fecha,Costo,Km, Detalle) VALUES ('"+formato.format(fecha)+"', 0 ,'"+ Km +"' , ' ') ;");
 
                                 } catch (SQLException ex) {
                                     Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
@@ -768,7 +641,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
 
                                     int i = 0;
                                     try {
-                                        rs = st.executeQuery("SELECT idServicios FROM servicios "
+                                        rs = BD.st.executeQuery("SELECT idServicios FROM servicios "
                                                 + " WHERE fecha = '"+formato.format(fecha)+"' AND costo = 0 AND Km = '"+Km+"' ;");
                                         rs.beforeFirst();
                                         while (rs.next())
@@ -782,7 +655,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
 
 
                                 try {
-                                      rs = st.executeQuery("SELECT idServicios FROM servicios "
+                                      rs = BD.st.executeQuery("SELECT idServicios FROM servicios "
                                                 + " WHERE fecha = '"+formato.format(fecha)+"' AND costo = 0 AND Km = '"+Km+"' ;");
                                     for (i=0 ; rs.next(); i++)
                                         data [i] = rs.getInt("idServicios");
@@ -796,9 +669,9 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                     for ( i=0 ; i < aux; i++){
                                         System.out.println("data : " + data [i]);
                                         System.out.println("id 2 : " + id2 [i]);
-                                        st.execute("INSERT INTO servicios_has_automovil "
+                                        BD.st.execute("INSERT INTO servicios_has_automovil "
                                                 + "VALUES ('"+data [i] +"','"+Placa+"','" +Modelo+"')");
-                                        st.execute("INSERT INTO servicios_has_tipo_servicio "
+                                        BD.st.execute("INSERT INTO servicios_has_tipo_servicio "
                                                 + "VALUES ('"+data [i] +"','"+id2 [i]+"')");
                                     }
                                 } catch (SQLException ex) {
@@ -826,32 +699,8 @@ public class Serviciosasociados extends javax.swing.JFrame {
     
     public void AgregarServicioProveedor (final String Rif, final String Razon_Social) throws SQLException{
         
-        Statement st = null; 
-        Connection con = null;
         int cont =0;
-        
-        
-        try {
-           try {
-               Class.forName("com.mysql.jdbc.Driver").newInstance();
-           } catch (InstantiationException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           } catch (IllegalAccessException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-
-            st  = con.createStatement();
-            
-                
-            
-            ResultSet rs = null;
-            
-
+    
             //Creamos un scrollpanel y se lo agregamos a la tabla 
             JScrollPane scrollpane = new JScrollPane();
 
@@ -860,7 +709,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
 
 
         
-                        rs=st.executeQuery("SELECT Descripcion FROM tipo_servicio ;");
+                        rs=BD.st.executeQuery("SELECT Descripcion FROM tipo_servicio ;");
                          rs.beforeFirst();
 
                             while (rs.next())
@@ -872,7 +721,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                     final  JCheckBox checkBox[] = new JCheckBox [cont] ;
                     final  JLabel tipo [] = new JLabel [cont];
                     final int id [] = new int[cont];
-                     rs=st.executeQuery("SELECT Descripcion, idTipo_Servicio FROM tipo_servicio ;");
+                     rs=BD.st.executeQuery("SELECT Descripcion, idTipo_Servicio FROM tipo_servicio ;");
                         rs.beforeFirst();
 
                             int y= 20;
@@ -899,41 +748,13 @@ public class Serviciosasociados extends javax.swing.JFrame {
                         @Override
                         public void actionPerformed(ActionEvent e) {
 
-                            Statement st = null; 
-                            Connection con = null;
-
-
-                            try {
-                               try {
-                                   Class.forName("com.mysql.jdbc.Driver").newInstance();
-                               } catch (InstantiationException ex) {
-                                   Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                               } catch (IllegalAccessException ex) {
-                                   Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                               }
-                            } catch (ClassNotFoundException ex) {
-                                Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-
-                                    try {
-                                        con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-                                    } catch (SQLException ex) {
-                                        Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
-                                    }
-
-                                    try {
-                                        st  = con.createStatement();
-                                    } catch (SQLException ex) {
-                                        Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
-                                    }
-
                                     boolean flag = false;
                                     for (int j=1 ; j<=f; j++ ){
                                         if ( checkBox[j-1].isSelected() ){
                                                 try {
                                                     System.out.println(Rif);
                                                     System.out.println(j);
-                                                    st.execute("INSERT INTO Tipo_Servicio_has_Proveedor VALUES ("+id[j-1]+",'"+Rif+"', '"+Razon_Social+"' ) ; ");
+                                                    BD.st.execute("INSERT INTO Tipo_Servicio_has_Proveedor VALUES ("+id[j-1]+",'"+Rif+"', '"+Razon_Social+"' ) ; ");
                                                     flag = true;
                                                 } catch (SQLException ex) {
                                                     Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
@@ -955,36 +776,15 @@ public class Serviciosasociados extends javax.swing.JFrame {
     }
     
     public void EditarServicioProveedor (final String Rif, final String Razon_Social) throws SQLException{
-        
-          Statement st = null; 
-        Connection con = null;
+ 
         int cont =0;
-        
-        
-        try {
-           try {
-               Class.forName("com.mysql.jdbc.Driver").newInstance();
-           } catch (InstantiationException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           } catch (IllegalAccessException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-
-            st  = con.createStatement();
-            
-                
-            
+    
             ResultSet rs = null;
             
         
           
                 cont=0;
-                rs=st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " + 
+                rs=BD.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " + 
                                     " FROM tipo_servicio, proveedor,tipo_servicio_has_proveedor as tp"+
                                     " WHERE tp.Proveedor_Rif = '"+ Rif +"' AND idTipo_Servicio  = tp.Tipo_Servicio_idTipo_Servicio ;");
                     rs.beforeFirst();
@@ -1000,7 +800,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
 
                 
                     cont=0;
-                     rs=st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " + 
+                     rs=BD.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " + 
                                     " FROM tipo_servicio, proveedor,tipo_servicio_has_proveedor as tp"+
                                     " WHERE tp.Proveedor_Rif = '"+ Rif +"' AND idTipo_Servicio  = tp.Tipo_Servicio_idTipo_Servicio; ");
                      rs.beforeFirst();
@@ -1012,7 +812,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                     }
                             
                             
-                    rs=st.executeQuery("SELECT Distinct Descripcion, idTipo_Servicio FROM tipo_servicio ;");
+                    rs=BD.st.executeQuery("SELECT Distinct Descripcion, idTipo_Servicio FROM tipo_servicio ;");
                     rs.beforeFirst();
                     cont=0;
                      while (rs.next())
@@ -1026,7 +826,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                     final JCheckBox checkBox[] = new JCheckBox [cont] ;
                     final JLabel tipo [] = new JLabel [cont]; 
                      
-                    rs=st.executeQuery("SELECT Descripcion, idTipo_Servicio FROM tipo_servicio ;");
+                    rs=BD.st.executeQuery("SELECT Descripcion, idTipo_Servicio FROM tipo_servicio ;");
                     rs.beforeFirst();
                     
                     int y= 20;
@@ -1065,33 +865,6 @@ public class Serviciosasociados extends javax.swing.JFrame {
                         @Override
                         public void actionPerformed(ActionEvent e) {
 
-                            Statement st = null; 
-                            Connection con = null;
-
-
-                            try {
-                               try {
-                                   Class.forName("com.mysql.jdbc.Driver").newInstance();
-                               } catch (InstantiationException ex) {
-                                   Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                               } catch (IllegalAccessException ex) {
-                                   Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                               }
-                            } catch (ClassNotFoundException ex) {
-                                Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-
-                                    try {
-                                        con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-                                    } catch (SQLException ex) {
-                                        Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
-                                    }
-
-                                    try {
-                                        st  = con.createStatement();
-                                    } catch (SQLException ex) {
-                                        Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
-                                    }
                                     
                                     int flag = 1;
                                     int flag2 = 1;
@@ -1132,7 +905,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                                                  try {
                                                                     System.out.println(Rif);
                                                                     System.out.println(j);
-                                                                    st.execute("INSERT INTO Tipo_Servicio_has_Proveedor VALUES ("+ (int) servicios2 [1] [j] +",'"+Rif+"', '"+Razon_Social+"' )");
+                                                                    BD.st.execute("INSERT INTO Tipo_Servicio_has_Proveedor VALUES ("+ (int) servicios2 [1] [j] +",'"+Rif+"', '"+Razon_Social+"' )");
                                                                 } catch (SQLException ex) {
                                                                     Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
                                                                 }
@@ -1159,7 +932,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                             
                                                          if (flag == 0){
                                                                 try {
-                                                                    st.execute(" DELETE FROM servi_cam.tipo_servicio_has_proveedor"
+                                                                    BD.st.execute(" DELETE FROM servi_cam.tipo_servicio_has_proveedor"
                                                                             + " WHERE Tipo_Servicio_idTipo_Servicio ='"+(int) servicios2 [1] [j]+ "' and Proveedor_Rif ='"+ Rif +"';");
                                                                 } catch (SQLException ex) {
                                                                     Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);

@@ -4,17 +4,13 @@
  * and open the template in the editor.
  */
 
-package Grafica;
+package Objetos;
 
 import Grafica.Index;
 import Grafica.NuevoCam;
-import Grafica.Productos;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.sql.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import javax.swing.UnsupportedLookAndFeelException;
 
 /**

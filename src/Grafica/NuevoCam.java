@@ -6,20 +6,16 @@
 
 package Grafica;
 
+import Objetos.manejador_bd;
 import java.awt.Button;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -30,15 +26,14 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class NuevoCam extends javax.swing.JFrame {
 
     private Serviciosasociados serv;
-    private Statement st = null;
-    private Connection con = null;
     private ResultSet rs = null;
+    private static manejador_bd BD;
     
     public NuevoCam() throws SQLException {
         initComponents();
         this.setTitle("Crear un nuevo camión.");
         serv = new Serviciosasociados();
-        conexion();
+        BD = new manejador_bd();
     }
 
     
@@ -197,40 +192,18 @@ public class NuevoCam extends javax.swing.JFrame {
             Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
+            BD.con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
         } catch (SQLException ex) {
             Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            st  = con.createStatement();
+            BD.st  = BD.con.createStatement();
         } catch (SQLException ex) {
             Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
     private void EditarbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditarbtnActionPerformed
-       
-        try {
-            try {
-                Class.forName("com.mysql.jdbc.Driver").newInstance();
-            } catch (InstantiationException ex) {
-                Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            st  = con.createStatement();
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-        }
 
         Button btn = new Button("Aceptar.");
         btn.setBounds(100, 280, 100, 30);
@@ -242,7 +215,7 @@ public class NuevoCam extends javax.swing.JFrame {
          Ml = Modelotext.getText();
          
         try {
-            rs= st.executeQuery("SELECT * FROM automovil WHERE Placa = '"+ Pl + "'  AND Model = '" + Ml + "' ; ");
+            rs= BD.st.executeQuery("SELECT * FROM automovil WHERE Placa = '"+ Pl + "'  AND Model = '" + Ml + "' ; ");
         } catch (SQLException ex) {
             Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -261,34 +234,9 @@ public class NuevoCam extends javax.swing.JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                
-                   Statement st = null;
-        Connection con = null;
-         ResultSet rs = null;
-        try {
-            try {
-                Class.forName("com.mysql.jdbc.Driver").newInstance();
-            } catch (InstantiationException ex) {
-                Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            st  = con.createStatement();
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-        }
             
                 try {
-                    st.execute("UPDATE automovil"
+                    BD.st.execute("UPDATE automovil"
                             + " SET Placa = '" + Placatext.getText() + "' , Model = '" + Modelotext.getText() + "' , "
                             + "Chofer = '" + Chofertext.getText() + "' , Km = " + Kilometrajespin.getValue()
                             + " WHERE Placa = '"+ Pl +"' AND Model = '"+ Ml + "' ; ");
@@ -344,14 +292,14 @@ public class NuevoCam extends javax.swing.JFrame {
        int cont = 0 ;
    
         try {
-            st.execute("INSERT INTO automovil VALUES ('"+camion[0]+"','"+camion[1]+"','"
+            BD.st.execute("INSERT INTO automovil VALUES ('"+camion[0]+"','"+camion[1]+"','"
                     +camion[2]+"',"+camion[3]+",'"+camion[4]+"') ; ");
         } catch (SQLException ex) {
             Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         try {
-            rs=st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " +
+            rs=BD.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " +
                     " FROM tipo_servicio, automovil ,tipo_servicio_has_automovil as ta"+
                     " WHERE ta.Automovil_Placa = '"+ camion [0] +"' AND ta.Automovil_Model = '"+ camion [1] +"' AND idTipo_Servicio  = ta.Tipo_Servicio_idTipo_Servicio; ");
         } catch (SQLException ex) {
@@ -401,33 +349,10 @@ public class NuevoCam extends javax.swing.JFrame {
 
     private void CrearCamionbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CrearCamionbtnActionPerformed
         
-          try {
-            try {
-                Class.forName("com.mysql.jdbc.Driver").newInstance();
-            } catch (InstantiationException ex) {
-                Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            st  = con.createStatement();
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        
         
         int cont =0;
         try {
-            rs=st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio" +
+            rs=BD.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio" +
                     " FROM tipo_servicio_has_automovil as ta"+
                     " WHERE ta.Automovil_Placa = '"+ Placatext.getText()  +"' AND ta.Automovil_Model = '"+ Modelotext.getText() +"' ; ");
         } catch (SQLException ex) {

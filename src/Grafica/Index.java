@@ -6,21 +6,11 @@
 
 package Grafica;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.LayoutManager;
-import java.sql.Connection;
-import java.sql.DriverManager;
+import Objetos.CrearImagen;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.AttributedCharacterIterator;
-import java.util.Map;
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.UnsupportedLookAndFeelException;
 
 /**
@@ -349,8 +339,14 @@ public class Index extends javax.swing.JFrame {
     }//GEN-LAST:event_ConsultarPActionPerformed
 
     private void CrEdPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CrEdPActionPerformed
-            NuevoPro proveedor = new NuevoPro ();
+            NuevoPro proveedor;
+        try {
+            proveedor = new NuevoPro ();
             proveedor.setVisible(true);
+        } catch (SQLException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
     }//GEN-LAST:event_CrEdPActionPerformed
 
     private void ConsultarIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConsultarIActionPerformed
@@ -369,8 +365,14 @@ public class Index extends javax.swing.JFrame {
     }//GEN-LAST:event_CrEdIActionPerformed
 
     private void CrTSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CrTSActionPerformed
-        NuevoTS ts = new NuevoTS();
-        ts.setVisible(true);
+        NuevoTS ts;
+        try {
+            ts = new NuevoTS();
+            ts.setVisible(true);
+        } catch (SQLException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }//GEN-LAST:event_CrTSActionPerformed
 
     private void EditarSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditarSActionPerformed

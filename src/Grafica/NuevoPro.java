@@ -6,11 +6,9 @@
 
 package Grafica;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+import Objetos.manejador_bd;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -25,9 +23,15 @@ public class NuevoPro extends javax.swing.JFrame {
     /**
      * Creates new form NuevoCam
      */
-    public NuevoPro() {
+    
+    private static manejador_bd BD;
+   
+    
+    
+    public NuevoPro() throws SQLException {
         initComponents();
         this.setTitle("Crear un nuevo proveedor.");
+        BD = new manejador_bd();
     }
     
     public void editar (){
@@ -235,36 +239,11 @@ public class NuevoPro extends javax.swing.JFrame {
            
         
         int cont = 0;
-        Statement st = null; 
-        Connection con = null;
-        
-         try {
-            try {
-                Class.forName("com.mysql.jdbc.Driver").newInstance();
-            } catch (InstantiationException ex) {
-                Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            st  = con.createStatement();
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
         ResultSet rs = null;
         
        
         try {
-            rs=st.executeQuery( " SELECT * " +
+            rs=BD.st.executeQuery( " SELECT * " +
                     " FROM tipo_servicio_has_proveedor"+
                     " WHERE Proveedor_Rif = '"+ RifText.getText()  +"' ; ");
             rs.beforeFirst();
@@ -300,7 +279,7 @@ public class NuevoPro extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
        
        Object Proveedor [] = new Object [9];
-       
+        ResultSet rs = null;
 
                         Proveedor [0] = RifText.getText();
                         Proveedor [1] = RazonsText.getText();
@@ -315,39 +294,10 @@ public class NuevoPro extends javax.swing.JFrame {
                if (!Tlf1text.getText().equals("")){
                    if (!Direcciontext.getText().equals("")){
                       
-                       
-                        Statement st = null; 
-                        Connection con = null;
-
-                            try {
-                            try {
-                                Class.forName("com.mysql.jdbc.Driver").newInstance();
-                            } catch (InstantiationException ex) {
-                                Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                            } catch (IllegalAccessException ex) {
-                                Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                         } catch (ClassNotFoundException ex) {
-                             Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                         }
-                         try {
-                             con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-                         } catch (SQLException ex) {
-                             Logger.getLogger(NuevoPro.class.getName()).log(Level.SEVERE, null, ex);
-                         }
-                         try {
-                             st  = con.createStatement();
-                         } catch (SQLException ex) {
-                             Logger.getLogger(NuevoPro.class.getName()).log(Level.SEVERE, null, ex);
-                         }
-
-
-
-                             ResultSet rs = null;
 
                          try {
 
-                             st.execute("INSERT INTO proveedor VALUES ('"+Proveedor[0]+"','"+Proveedor[1]+"','"
+                             BD.st.execute("INSERT INTO proveedor VALUES ('"+Proveedor[0]+"','"+Proveedor[1]+"','"
                                      +Proveedor[6]+"','"+Proveedor[4]+"','"+Proveedor[3]+"','"
                                      +Proveedor[2]+"','"+Proveedor[5]+"')");
                          } catch (SQLException ex) {
@@ -436,7 +386,11 @@ public class NuevoPro extends javax.swing.JFrame {
                 } catch (UnsupportedLookAndFeelException ex) {
                     Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                new NuevoPro().setVisible(true);
+                try {
+                    new NuevoPro().setVisible(true);
+                } catch (SQLException ex) {
+                    Logger.getLogger(NuevoPro.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }

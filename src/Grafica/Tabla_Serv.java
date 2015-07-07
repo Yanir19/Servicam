@@ -7,30 +7,19 @@
 package Grafica;
 
 
-import static com.sun.org.apache.xalan.internal.lib.ExsltDatetime.date;
-import static com.sun.org.apache.xalan.internal.lib.ExsltDatetime.date;
+import Objetos.manejador_bd;
 import java.awt.Dimension;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author Yanir
- */
 
 
     
@@ -40,36 +29,19 @@ public class Tabla_Serv extends javax.swing.JFrame {
     
     
     private Object data [][] ;
+    private static manejador_bd BD;
     /**
      * Creates new form NuevoServ
      */
     public Tabla_Serv() throws SQLException {
         initComponents();
         
-        Statement st = null; 
-       Connection con = null;
-       this.setMinimumSize(new Dimension(800, 600)); 
-        try {
-           try {
-               Class.forName("com.mysql.jdbc.Driver").newInstance();
-           } catch (InstantiationException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           } catch (IllegalAccessException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-
-            st  = con.createStatement();
-            
+        BD = new manejador_bd();
                 
             
             ResultSet rs = null;
             
-            rs = st.executeQuery(" select count(Servicios_idServicios) as cantidad " +
+            rs = BD.st.executeQuery(" select count(Servicios_idServicios) as cantidad " +
                                  " from inventario_has_servicios ;");
             rs.beforeFirst();
             while (rs.next())
@@ -78,7 +50,7 @@ public class Tabla_Serv extends javax.swing.JFrame {
             }
              
             
-            rs = st.executeQuery("Select idServicios_auto, Descripcion, servicios2.Inventario_Marca, servicios2.Inventario_Producto, Automovil_Placa, Automovil_Model, Cantidad " +
+            rs = BD.st.executeQuery("Select idServicios_auto, Descripcion, servicios2.Inventario_Marca, servicios2.Inventario_Producto, Automovil_Placa, Automovil_Model, Cantidad " +
                                 "from servicios_has_automovil, tipo_servicio, " +
                                 "(Select Servicios_idServicios, Tipo_Servicio_idTipo_Servicio, Cantidad, ser_inv.Inventario_Marca, ser_inv.Inventario_Producto " +
                                 "from inventario_has_servicios as ser_inv  " +

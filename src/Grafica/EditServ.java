@@ -5,6 +5,7 @@
  */
 package Grafica;
 
+import Objetos.manejador_bd;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -12,7 +13,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.DefaultListModel;
 import javax.swing.UnsupportedLookAndFeelException;
 
 /**
@@ -22,10 +22,10 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class EditServ extends javax.swing.JFrame {
 
     
-    private Statement st = null; 
-    private Connection con = null;
     private ResultSet rs = null;
+    private static manejador_bd BD;
     
+   
     
     public EditServ() throws SQLException {
         
@@ -33,24 +33,7 @@ public class EditServ extends javax.swing.JFrame {
         this.setTitle("Servicios.");
         this.getContentPane().remove(Aceptarbtn);
         this.getContentPane().remove(Serviciotextfield);
-       
-        try {
-           try {
-               Class.forName("com.mysql.jdbc.Driver").newInstance();
-           } catch (InstantiationException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           } catch (IllegalAccessException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-
-            st  = con.createStatement();
-            
-            rellenar();
+        BD = new manejador_bd();
         
     }
 
@@ -210,7 +193,7 @@ public class EditServ extends javax.swing.JFrame {
         Nombrelbl.setText(seleccion);
         
         try {
-            rs = st.executeQuery("select Automovil_Model, Automovil_Placa, Razon_Social, Inventario_Marca, Inventario_Producto " +
+            rs = BD.st.executeQuery("select Automovil_Model, Automovil_Placa, Razon_Social, Inventario_Marca, Inventario_Producto " +
                                 "from (select idTipo_Servicio from tipo_servicio where Descripcion = '"+seleccion+"') as ts " +
                                 "right join tipo_servicio_has_automovil  " +
                                 "on ts.idTipo_Servicio = tipo_servicio_has_automovil.Tipo_Servicio_idTipo_Servicio  " +
@@ -252,7 +235,7 @@ public class EditServ extends javax.swing.JFrame {
     private void AceptarbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AceptarbtnActionPerformed
         
         try {
-            st.execute("UPDATE tipo_servicio SET  Descripcion = '"+Serviciotextfield.getText()+"' WHERE Descripcion = '"+Nombrelbl.getText()+"' ;");
+            BD.st.execute("UPDATE tipo_servicio SET  Descripcion = '"+Serviciotextfield.getText()+"' WHERE Descripcion = '"+Nombrelbl.getText()+"' ;");
             rellenar();
             Nombrelbl.setText(Serviciotextfield.getText());
             this.getContentPane().remove(Aceptarbtn);
@@ -274,7 +257,7 @@ public class EditServ extends javax.swing.JFrame {
 
     private void EliminarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EliminarBtnActionPerformed
         try {
-            st.execute("DELETE FROM `servi_cam`.`tipo_servicio` WHERE `Descripcion`='"+Nombrelbl.getText()+"';");
+            BD.st.execute("DELETE FROM `servi_cam`.`tipo_servicio` WHERE `Descripcion`='"+Nombrelbl.getText()+"';");
             rellenar ();
         } catch (SQLException ex) {
             Logger.getLogger(EditServ.class.getName()).log(Level.SEVERE, null, ex);
@@ -285,7 +268,7 @@ public class EditServ extends javax.swing.JFrame {
             
             Servicioslist.removeAll();
             Productoslist.removeAll();
-           rs = st.executeQuery("SELECT Descripcion FROM servi_cam.tipo_servicio;");
+           rs = BD.st.executeQuery("SELECT Descripcion FROM servi_cam.tipo_servicio;");
             int i;
             
             for(i=0; rs.next(); i++);

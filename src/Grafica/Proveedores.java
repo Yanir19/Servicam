@@ -6,6 +6,7 @@
 
 package Grafica;
 
+import Objetos.manejador_bd;
 import java.awt.Button;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
@@ -18,8 +19,6 @@ import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JTextField;
 import javax.swing.UnsupportedLookAndFeelException;
 
 /**
@@ -29,61 +28,46 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 
 
+
+
+
 public class Proveedores extends javax.swing.JFrame {
 
     /**
      * Creates new form Proveedores
      */
+    private static manejador_bd BD;
     
     private TextField info [] = new TextField [7];
     
+    @SuppressWarnings("empty-statement")
     public Proveedores() throws SQLException {
         initComponents();
         this.setTitle("Proveedores.");
-     
-       Statement st = null; 
-       Connection con = null;
-       
-        try {
-           try {
-               Class.forName("com.mysql.jdbc.Driver").newInstance();
-           } catch (InstantiationException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           } catch (IllegalAccessException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-
-            st  = con.createStatement();
-            
+        BD = new manejador_bd();
                 
-            
-            ResultSet rs = null;
-                    
-            rs = st.executeQuery("SELECT RazonSocial FROM proveedor;");
-            
-            int i;
-            
-            for(i=0; rs.next(); i++);
-            
-            rs.beforeFirst();
-            String razones []= new String [i];  
-            for(i=0; rs.next(); i++)
-            {
-             System.out.println( razones [i] = rs.getString("RazonSocial"));
-            }
-            
-            
-            
-            
-            rs.close();
-  
-            for (i = 0; i<=razones.length-1;i++)
-            proveedoreslist.add(razones[i]);
+        ResultSet rs = null;
+
+        rs = BD.st.executeQuery("SELECT RazonSocial FROM proveedor;");
+
+        int i;
+
+        for(i=0; rs.next(); i++);
+
+        rs.beforeFirst();
+        String razones []= new String [i];  
+        for(i=0; rs.next(); i++)
+        {
+         System.out.println( razones [i] = rs.getString("RazonSocial"));
+        }
+
+
+
+
+        rs.close();
+
+        for (i = 0; i<=razones.length-1;i++)
+        proveedoreslist.add(razones[i]);
         
         
     }
@@ -227,43 +211,12 @@ public class Proveedores extends javax.swing.JFrame {
         String selección;
         Object [] proveedor = new Object [9] ;
         selección = proveedoreslist.getSelectedItem();
-        
+        ResultSet rs = null;
          DefaultListModel modelo = new DefaultListModel();  
        // ServicioList.setModel(modelo);
-        
-       Statement st = null; 
-       Connection con = null;
-       
-        try {
-           try {
-               Class.forName("com.mysql.jdbc.Driver").newInstance();
-           } catch (InstantiationException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           } catch (IllegalAccessException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {        
-            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-        } catch (SQLException ex) {
-            Logger.getLogger(Proveedores.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            st  = con.createStatement();
-        } catch (SQLException ex) {
-            Logger.getLogger(Proveedores.class.getName()).log(Level.SEVERE, null, ex);
-        }
-            
-                
-            
-        ResultSet rs = null;
-    
-            
        
         try {            
-            rs = st.executeQuery("SELECT * FROM proveedor WHERE RazonSocial = '" +selección+"'");
+            rs = BD.st.executeQuery("SELECT * FROM proveedor WHERE RazonSocial = '" +selección+"'");
         } catch (SQLException ex) {
             Logger.getLogger(Proveedores.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -294,7 +247,7 @@ public class Proveedores extends javax.swing.JFrame {
            
         
         try {            
-            rs = st.executeQuery("SELECT Descripcion FROM tipo_servicio INNER JOIN tipo_servicio_has_proveedor as tp ON ( tp.Proveedor_Rif = '"+proveedor [1]+"' ) AND (  tipo_servicio.idTipo_Servicio = tp.Tipo_Servicio_idTipo_Servicio);");
+            rs = BD.st.executeQuery("SELECT Descripcion FROM tipo_servicio INNER JOIN tipo_servicio_has_proveedor as tp ON ( tp.Proveedor_Rif = '"+proveedor [1]+"' ) AND (  tipo_servicio.idTipo_Servicio = tp.Tipo_Servicio_idTipo_Servicio);");
         } catch (SQLException ex) {
             Logger.getLogger(Proveedores.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -408,40 +361,8 @@ public class Proveedores extends javax.swing.JFrame {
            @Override
            public void actionPerformed(ActionEvent e) {
                
-
-            Statement st = null; 
-            Connection con = null;
-
             try {
-                try {
-                    Class.forName("com.mysql.jdbc.Driver").newInstance();
-                } catch (InstantiationException ex) {
-                    Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            } catch (ClassNotFoundException ex) {
-                 Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-            }
-             try {        
-                 con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-             } catch (SQLException ex) {
-                 Logger.getLogger(Proveedores.class.getName()).log(Level.SEVERE, null, ex);
-             }
-             try {
-                 st  = con.createStatement();
-             } catch (SQLException ex) {
-                 Logger.getLogger(Proveedores.class.getName()).log(Level.SEVERE, null, ex);
-             }
-
-
-     
-               
-               
-               
-               
-            try {
-                st.execute("UPDATE proveedor "
+                BD.st.execute("UPDATE proveedor "
                         + " SET Rif = '"+info [1].getText()+"', RazonSocial = '"+info [0].getText()+ "', Direcion = '"+info [6].getText()+"', Fax = "+info [4].getText()+" , Tlf1 = '"+info [2].getText()+"' , Tlf2 = "+info [3].getText()+" , Contacto = '"+info [5].getText()+"' "
                         + "  WHERE Rif = '"+info [1].getText()+"' ;");
             } catch (SQLException ex) {
@@ -465,7 +386,7 @@ public class Proveedores extends javax.swing.JFrame {
             
               
             try {            
-                rs = st.executeQuery("SELECT Descripcion FROM tipo_servicio INNER JOIN tipo_servicio_has_proveedor as tp ON ( tp.Proveedor_Rif = '"+info [1].getText()+"' ) AND (  tipo_servicio.idTipo_Servicio = tp.Tipo_Servicio_idTipo_Servicio);");
+                rs = BD.st.executeQuery("SELECT Descripcion FROM tipo_servicio INNER JOIN tipo_servicio_has_proveedor as tp ON ( tp.Proveedor_Rif = '"+info [1].getText()+"' ) AND (  tipo_servicio.idTipo_Servicio = tp.Tipo_Servicio_idTipo_Servicio);");
             } catch (SQLException ex) {
                 Logger.getLogger(Proveedores.class.getName()).log(Level.SEVERE, null, ex);
             }

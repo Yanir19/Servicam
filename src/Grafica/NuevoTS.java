@@ -6,11 +6,9 @@
 
 package Grafica;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+import Objetos.manejador_bd;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -24,9 +22,16 @@ public class NuevoTS extends javax.swing.JFrame {
     /**
      * Creates new form NuevoTS
      */
-    public NuevoTS() {
+    
+    private static manejador_bd BD;
+   
+    
+    
+    
+    public NuevoTS() throws SQLException {
         initComponents();
         this.setTitle("Crear un nuevo tipo de servicio.");
+        BD = new manejador_bd();
     }
 
     /**
@@ -107,37 +112,12 @@ public class NuevoTS extends javax.swing.JFrame {
     }//GEN-LAST:event_ServicioTEXTActionPerformed
 
     private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
-        Statement st = null; 
-        Connection con = null;
+
         ResultSet rs = null;
         boolean flag = true;
-       
-        try {
-           try {
-               Class.forName("com.mysql.jdbc.Driver").newInstance();
-           } catch (InstantiationException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           } catch (IllegalAccessException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
         
         try {
-            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoTS.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        try {
-            st  = con.createStatement();
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoTS.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        try {
-            rs = st.executeQuery("SELECT distinct  Descripcion from tipo_servicio;");
+            rs = BD.st.executeQuery("SELECT distinct  Descripcion from tipo_servicio;");
             rs.beforeFirst();
         } catch (SQLException ex) {
             Logger.getLogger(NuevoTS.class.getName()).log(Level.SEVERE, null, ex);
@@ -153,7 +133,7 @@ public class NuevoTS extends javax.swing.JFrame {
         }
         if(flag){
             try {
-                st.execute( "INSERT INTO  Tipo_Servicio (Descripcion) VALUES ('"+ ServicioTEXT.getText()+ "');" );
+                BD.st.execute( "INSERT INTO  Tipo_Servicio (Descripcion) VALUES ('"+ ServicioTEXT.getText()+ "');" );
             } catch (SQLException ex) {
                 Logger.getLogger(NuevoTS.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -164,37 +144,11 @@ public class NuevoTS extends javax.swing.JFrame {
     }//GEN-LAST:event_button1ActionPerformed
 
     private void EliminarbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EliminarbtnActionPerformed
-         Statement st = null; 
-        Connection con = null;
-       
-        try {
-           try {
-               Class.forName("com.mysql.jdbc.Driver").newInstance();
-           } catch (InstantiationException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           } catch (IllegalAccessException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        try {
-            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoTS.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        try {
-            st  = con.createStatement();
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoTS.class.getName()).log(Level.SEVERE, null, ex);
-        }
         
         ResultSet rs = null;
             
         try {
-            rs=st.executeQuery("SELECT Descripcion FROM tipo_servicio ;");
+            rs=BD.st.executeQuery("SELECT Descripcion FROM tipo_servicio ;");
         } catch (SQLException ex) {
             Logger.getLogger(NuevoTS.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -210,7 +164,7 @@ public class NuevoTS extends javax.swing.JFrame {
                 if (ServicioTEXT.getText().equals(rs.getString("Descripcion"))){
                     System.out.println(rs.getString("Descripcion"));
                     System.out.println(ServicioTEXT.getText());
-                    st.execute(" DELETE FROM tipo_servicio  "
+                    BD.st.execute(" DELETE FROM tipo_servicio  "
                                + " WHERE Descripcion='"+ServicioTEXT.getText()+ "' ;");
                     
                 }
@@ -253,7 +207,11 @@ public class NuevoTS extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new NuevoTS().setVisible(true);
+                try {
+                    new NuevoTS().setVisible(true);
+                } catch (SQLException ex) {
+                    Logger.getLogger(NuevoTS.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }

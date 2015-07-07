@@ -6,15 +6,13 @@
 
 package Grafica;
 
+import Objetos.manejador_bd;
 import java.awt.BorderLayout;
-import java.awt.Checkbox;
 import java.awt.Dimension;
 import java.awt.Panel;
 import java.awt.ScrollPane;
-import java.awt.Scrollbar;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.AdjustmentListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -26,9 +24,6 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -45,8 +40,7 @@ public class Productos extends javax.swing.JFrame {
     private JLabel producto [];
     private int acumlador;
     private JSpinner contador [];
-    private Statement st = null; 
-    private Connection con = null;
+    private static manejador_bd BD;
     private ResultSet rs = null;
     private Boolean invent_cont = new Boolean(false);
     private Object producto1 [] [];
@@ -54,26 +48,14 @@ public class Productos extends javax.swing.JFrame {
     private int valor [];
     private int id [];
     private int f;
+  
+    
+    
     
     public Productos() throws SQLException {
        initComponents();
        this.setTitle("Productos.");
-          try {
-           try {
-               Class.forName("com.mysql.jdbc.Driver").newInstance();
-           } catch (InstantiationException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           } catch (IllegalAccessException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-            con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-
-            st  = con.createStatement();
-            
+       BD = new manejador_bd();
             
     }
 
@@ -91,7 +73,7 @@ public class Productos extends javax.swing.JFrame {
      
             System.out.println("idTipoServicio : "  + idTipoServicio);
             
-               rs=st.executeQuery( " SELECT Distinct Producto , Marca  " +
+               rs=BD.st.executeQuery( " SELECT Distinct Producto , Marca  " +
                                     "FROM tipo_servicio ,inventario_has_tipo_servicio as ta, Inventario " +
                                     "WHERE   tipo_servicio.idTipo_Servicio = "+idTipoServicio+" AND ta.Tipo_Servicio_idTipo_Servicio = tipo_servicio.idTipo_Servicio " +
                                     "AND Producto=  ta.Inventario_Producto and Marca =  ta.Inventario_Marca ;");
@@ -109,7 +91,7 @@ public class Productos extends javax.swing.JFrame {
             this.checkBox = new JCheckBox [i] ;
             producto1 = new Object[i][3];
             
-              rs=st.executeQuery( " SELECT Distinct Producto , Marca, id, cantidad, duracion " +
+              rs=BD.st.executeQuery( " SELECT Distinct Producto , Marca, id, cantidad, duracion " +
                                     "FROM tipo_servicio ,inventario_has_tipo_servicio as ta, Inventario " +
                                     "WHERE   tipo_servicio.idTipo_Servicio = "+idTipoServicio+" AND ta.Tipo_Servicio_idTipo_Servicio = tipo_servicio.idTipo_Servicio " +
                                     "AND Producto=  ta.Inventario_Producto and Marca =  ta.Inventario_Marca ;");
@@ -229,14 +211,14 @@ public class Productos extends javax.swing.JFrame {
                                     
                                     try {
                                         System.out.println("yo no debi entrar aqui");
-                                        st.execute("UPDATE Inventario SET Cantidad= Cantidad - "+ diferencia +
+                                        BD.st.execute("UPDATE Inventario SET Cantidad= Cantidad - "+ diferencia +
                                          " WHERE Producto = '"+producto [k].getText().substring(0,posicion) +"' and Marca =  '"+ producto [k].getText().substring(posicion+3)+"' ;");
                                     } catch (SQLException ex) {
                                         Logger.getLogger(Productos.class.getName()).log(Level.SEVERE, null, ex);
                                     }
 
                                     try {
-                                         st.execute("INSERT INTO servi_cam.inventario_has_servicios  "
+                                         BD.st.execute("INSERT INTO servi_cam.inventario_has_servicios  "
                                             + " VALUES ("+producto1[k][0]+",'"+producto [k].getText().substring(0,posicion)+"','"+ producto [k].getText().substring(posicion+3) +"' "
                                                  + ", "+idServicio+", "+ diferencia+" ) ;");
                                         } catch (SQLException ex) {
