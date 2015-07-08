@@ -644,12 +644,12 @@ public class Panelcam extends JPanel {
 
                 this.rs = BD.st.executeQuery("SELECT distinct ser.idServicios,ser.Km, ser.Fecha, tipo.Descripcion, ser.Costo, pro.RazonSocial, ser.Detalle " +
                                         "FROM servicios_has_automovil as sa, tipo_servicio as tipo, servicios as ser,  " +
-                                        "proveedor as pro, proveedor_has_servicios as ps, servicios_has_tipo_servicio as BD.st " +
+                                        "proveedor as pro, proveedor_has_servicios as ps, servicios_has_tipo_servicio as st " +
                                         "WHERE sa.Automovil_Placa = '" + camion [fila] [0] +"'" +
                                         " AND sa.Automovil_Model = '" +camion [fila] [1]  +"'" +
                                         " AND ser.idServicios = sa.idServicios_auto " +
-                                        " AND BD.st.Servicios_idServicios = sa.idServicios_auto " +
-                                        " AND tipo.idTipo_Servicio = BD.st.Tipo_Servicio_idTipo_Servicio " +
+                                        " AND st.Servicios_idServicios = sa.idServicios_auto " +
+                                        " AND tipo.idTipo_Servicio = st.Tipo_Servicio_idTipo_Servicio " +
                                         " AND ps.Servicios_idServicios = ser.idServicios " +
                                         " AND pro.Rif = ps.Proveedor_Rif" +
                                         " order by Fecha desc , ser.Km desc; ");
@@ -698,9 +698,9 @@ public class Panelcam extends JPanel {
                                         "FROM   servicios as ser, tipo_servicio as ts, " +
                                         "(select Tipo_Servicio_idTipo_Servicio, Servicios_idServicios as Servicios, Fecha " +
                                         "from  " +
-                                        "(select *FROM servicios_has_tipo_servicio as BD.st, servicios_has_automovil as sa, servicios " +
-                                        "WHERE sa.Automovil_Placa = '" + camion [fila] [0] + "'  AND sa.Automovil_Model = '"+ camion [fila] [1]+"'  AND  BD.st.Servicios_idServicios = sa.idServicios_auto  " +
-                                        "and BD.st.Servicios_idServicios = idServicios " +
+                                        "(select *FROM servicios_has_tipo_servicio as st, servicios_has_automovil as sa, servicios " +
+                                        "WHERE sa.Automovil_Placa = '" + camion [fila] [0] + "'  AND sa.Automovil_Model = '"+ camion [fila] [1]+"'  AND  st.Servicios_idServicios = sa.idServicios_auto  " +
+                                        "and st.Servicios_idServicios = idServicios " +
                                         "group by Tipo_Servicio_idTipo_Servicio, Fecha desc, Km desc) x " +
                                         "group by Tipo_Servicio_idTipo_Servicio ) as table1,  " +
                                         "tipo_servicio_has_automovil as ta  " +
