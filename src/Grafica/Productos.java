@@ -13,11 +13,8 @@ import java.awt.Panel;
 import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -94,7 +91,7 @@ public class Productos extends javax.swing.JFrame {
               rs=BD.st.executeQuery( " SELECT Distinct Producto , Marca, id, cantidad, duracion " +
                                     "FROM tipo_servicio ,inventario_has_tipo_servicio as ta, Inventario " +
                                     "WHERE   tipo_servicio.idTipo_Servicio = "+idTipoServicio+" AND ta.Tipo_Servicio_idTipo_Servicio = tipo_servicio.idTipo_Servicio " +
-                                    "AND Producto=  ta.Inventario_Producto and Marca =  ta.Inventario_Marca ;");
+                                    "AND Producto =  ta.Inventario_Producto and Marca =  ta.Inventario_Marca ;");
                                
             rs.beforeFirst();
             
@@ -180,54 +177,58 @@ public class Productos extends javax.swing.JFrame {
         return lista ;
     }
     
-     public void insertar (final int idServicio){
+public void insertar (final int idServicio){
         
-        
-                         
-                        float diferencia = 0 ;
-                        int posicion=0; 
-                        int litros = 0;
-                        float cantidad = 0;
-                        
-                        for (int k=0; k<f;k++){
-                            if (checkBox[k].isSelected()== true){
-                                System.out.println("producto : " + producto [k].getText() );
-                                posicion = producto [k].getText().indexOf(" - ");
-                              
-                                
-                                litros = producto1[k][2].toString().indexOf(" ");
-                                
-                              
-                                    if(litros>0){
-                                        cantidad = Integer.parseInt(producto1[k][2].toString().substring(0 , litros));
-                                        System.out.println("cantidad : " +cantidad);
-                                        System.out.println(" contador : " + (int)contador [k].getValue());
-                                        diferencia = ( (int) contador [k].getValue()/cantidad);
-                                          System.out.println("diferencia : " +diferencia);
-                                    }else{
-                                        diferencia = (int) contador [k].getValue();
-                                    }
-                                    
-                                    
-                                    try {
-                                        System.out.println("yo no debi entrar aqui");
-                                        BD.st.execute("UPDATE Inventario SET Cantidad= Cantidad - "+ diferencia +
-                                         " WHERE Producto = '"+producto [k].getText().substring(0,posicion) +"' and Marca =  '"+ producto [k].getText().substring(posicion+3)+"' ;");
-                                    } catch (SQLException ex) {
-                                        Logger.getLogger(Productos.class.getName()).log(Level.SEVERE, null, ex);
-                                    }
+                    
+System.out.println("entre a Productos.insertar");
 
-                                    try {
-                                         BD.st.execute("INSERT INTO servi_cam.inventario_has_servicios  "
-                                            + " VALUES ("+producto1[k][0]+",'"+producto [k].getText().substring(0,posicion)+"','"+ producto [k].getText().substring(posicion+3) +"' "
-                                                 + ", "+idServicio+", "+ diferencia+" ) ;");
-                                        } catch (SQLException ex) {
-                                            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
-                                        }
-               
-                                }   
-                        }
+    float diferencia = 0 ;
+    int posicion=0; 
+    int litros = 0;
+    float cantidad = 0;
+
+    for (int k=0; k<f;k++){
+        if (checkBox[k].isSelected()== true){
+            System.out.println("producto : " + producto [k].getText() );
+            posicion = producto [k].getText().indexOf(" - ");
+
+
+            litros =(int) producto1[k][2].toString().indexOf(" ");
+            
+              System.out.println("litros : " + litros);  
+
+
+                if(litros>0){
+                    cantidad = Integer.parseInt(producto1[k][2].toString().substring(0 , litros));
+                    System.out.println("cantidad : " +cantidad);
+                    System.out.println(" contador : " + (int)contador [k].getValue());
+                    diferencia = ( (int) contador [k].getValue()/cantidad);
+                      System.out.println("diferencia : " +diferencia);
+                }else{
+                    diferencia = (int) contador [k].getValue();
+                }
+
+
+                try {
+                    System.out.println("yo no debi entrar aqui");
+                    BD.st.execute("UPDATE Inventario SET Cantidad = Cantidad - "+ diferencia + " "+
+                     " WHERE Producto = '"+producto [k].getText().substring(0,posicion) +"' and Marca =  '"+ producto [k].getText().substring(posicion+3)+"' ;");
+                } catch (SQLException ex) {
+                    Logger.getLogger(Productos.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                try {
+                     BD.st.execute("INSERT INTO servi_cam.inventario_has_servicios  "
+                        + " VALUES ("+producto1[k][0]+",'"+producto [k].getText().substring(0,posicion)+"','"+ producto [k].getText().substring(posicion+3) +"' "
+                             + ", "+idServicio+", "+ diferencia+" ) ;");
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                    System.out.println("Inserte los datos en inventario_has_servicios ");
+            }   
     }
+}
     
     
     

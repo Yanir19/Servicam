@@ -7,7 +7,6 @@
 package Grafica;
 
 import Objetos.manejador_bd;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -36,12 +35,12 @@ public class NuevoProducto extends javax.swing.JFrame {
     private boolean acept = true; 
     private int idproducto ;
     private  static ArrayList lista_servicios_asociados = new ArrayList(); 
-    public NuevoProducto() {
+    public NuevoProducto() throws SQLException {
         initComponents();
         this.setTitle("Crear un nuevo producto.");
         this.getContentPane().remove(Aceptar);
         java.util.Date date = new Date();
-        
+        BD = new manejador_bd();
         try {
             Fecha.setDate(date);
             date = new SimpleDateFormat("dd-MM-yyyy").parse("01-01-0001");
@@ -49,29 +48,9 @@ public class NuevoProducto extends javax.swing.JFrame {
         } catch (ParseException ex) {
             Logger.getLogger(NuevoProducto.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        
-        try {
-        try {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
-        } catch (InstantiationException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-     } catch (ClassNotFoundException ex) {
-         Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-     }
-     try {
-         BD.con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-     } catch (SQLException ex) {
-         Logger.getLogger(NuevoProducto.class.getName()).log(Level.SEVERE, null, ex);
-     }
-     try {
-         BD.st  = BD.con.createStatement();
-     } catch (SQLException ex) {
-         Logger.getLogger(NuevoProducto.class.getName()).log(Level.SEVERE, null, ex);
-     }
+            
+        activar_desactivar_duracion();
+     
      
     }
 
@@ -111,11 +90,11 @@ public class NuevoProducto extends javax.swing.JFrame {
         jRadioButton4 = new javax.swing.JRadioButton();
         Aceptar = new javax.swing.JButton();
         Editar = new javax.swing.JButton();
-        Crear = new javax.swing.JButton();
         AgregarServicio = new javax.swing.JButton();
         Agregar = new javax.swing.JButton();
         Salir = new javax.swing.JButton();
         Eliminar = new javax.swing.JButton();
+        DuracionCheckbox = new javax.swing.JCheckBox();
 
         jTextField1.setText("jTextField1");
 
@@ -124,14 +103,24 @@ public class NuevoProducto extends javax.swing.JFrame {
         button1.setLabel("button1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         Producto.setText("Producto");
+        getContentPane().add(Producto, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 51, -1, -1));
 
         Marca.setText("Marca");
+        getContentPane().add(Marca, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 89, -1, -1));
 
         Costo.setText("Costo");
+        getContentPane().add(Costo, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 127, -1, -1));
 
         Kilometraje.setText("Cantidad");
+        getContentPane().add(Kilometraje, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 241, -1, -1));
+        getContentPane().add(Productotext, new org.netbeans.lib.awtextra.AbsoluteConstraints(105, 48, 180, -1));
+        Productotext.getAccessibleContext().setAccessibleName("Modelo");
+
+        getContentPane().add(Marcatext, new org.netbeans.lib.awtextra.AbsoluteConstraints(105, 86, 180, -1));
+        getContentPane().add(Costotext, new org.netbeans.lib.awtextra.AbsoluteConstraints(105, 124, 180, -1));
 
         buttonGroup1.add(jRadioButton1);
         jRadioButton1.setText("Días");
@@ -140,6 +129,7 @@ public class NuevoProducto extends javax.swing.JFrame {
                 jRadioButton1ActionPerformed(evt);
             }
         });
+        getContentPane().add(jRadioButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(68, 401, -1, -1));
 
         buttonGroup1.add(jRadioButton2);
         jRadioButton2.setText("Meses");
@@ -148,6 +138,7 @@ public class NuevoProducto extends javax.swing.JFrame {
                 jRadioButton2ActionPerformed(evt);
             }
         });
+        getContentPane().add(jRadioButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(131, 401, -1, -1));
 
         buttonGroup1.add(jRadioButton3);
         jRadioButton3.setSelected(true);
@@ -157,21 +148,33 @@ public class NuevoProducto extends javax.swing.JFrame {
                 jRadioButton3ActionPerformed(evt);
             }
         });
+        getContentPane().add(jRadioButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(204, 401, -1, -1));
+        getContentPane().add(CantidadSpinner, new org.netbeans.lib.awtextra.AbsoluteConstraints(105, 238, 113, -1));
 
         ServicioLabel.setText("Servicios");
+        getContentPane().add(ServicioLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(31, 451, -1, 23));
+        getContentPane().add(SugeridoSpin, new org.netbeans.lib.awtextra.AbsoluteConstraints(105, 276, 113, -1));
 
         jLabel2.setText("Sugerido");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(31, 279, -1, -1));
 
         jLabel3.setText("Duración");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(31, 369, -1, -1));
+        getContentPane().add(DuracionSpinner, new org.netbeans.lib.awtextra.AbsoluteConstraints(91, 363, 113, -1));
 
         FechaLb.setText("Fecha");
+        getContentPane().add(FechaLb, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 165, -1, -1));
+        getContentPane().add(Fecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(105, 159, 113, -1));
 
         jLabel1.setText("Vencimiento");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 203, -1, -1));
 
         Vencimiento_Date.setMinSelectableDate(new java.util.Date(-62135749709000L));
+        getContentPane().add(Vencimiento_Date, new org.netbeans.lib.awtextra.AbsoluteConstraints(105, 197, 113, -1));
 
         buttonGroup1.add(jRadioButton4);
         jRadioButton4.setText("Litros");
+        getContentPane().add(jRadioButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(269, 401, -1, -1));
 
         Aceptar.setText("Aceptar");
         Aceptar.addActionListener(new java.awt.event.ActionListener() {
@@ -179,6 +182,7 @@ public class NuevoProducto extends javax.swing.JFrame {
                 AceptarActionPerformed(evt);
             }
         });
+        getContentPane().add(Aceptar, new org.netbeans.lib.awtextra.AbsoluteConstraints(59, 541, 82, -1));
 
         Editar.setText("Editar");
         Editar.addActionListener(new java.awt.event.ActionListener() {
@@ -186,13 +190,7 @@ public class NuevoProducto extends javax.swing.JFrame {
                 EditarActionPerformed(evt);
             }
         });
-
-        Crear.setText("Crear");
-        Crear.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CrearActionPerformed(evt);
-            }
-        });
+        getContentPane().add(Editar, new org.netbeans.lib.awtextra.AbsoluteConstraints(159, 500, 82, -1));
 
         AgregarServicio.setText("Agregar servicio");
         AgregarServicio.addActionListener(new java.awt.event.ActionListener() {
@@ -200,6 +198,7 @@ public class NuevoProducto extends javax.swing.JFrame {
                 AgregarServicioActionPerformed(evt);
             }
         });
+        getContentPane().add(AgregarServicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(139, 451, -1, -1));
 
         Agregar.setText("Agregar");
         Agregar.addActionListener(new java.awt.event.ActionListener() {
@@ -207,6 +206,7 @@ public class NuevoProducto extends javax.swing.JFrame {
                 AgregarActionPerformed(evt);
             }
         });
+        getContentPane().add(Agregar, new org.netbeans.lib.awtextra.AbsoluteConstraints(59, 500, 82, -1));
 
         Salir.setText("Salir");
         Salir.addActionListener(new java.awt.event.ActionListener() {
@@ -214,6 +214,7 @@ public class NuevoProducto extends javax.swing.JFrame {
                 SalirActionPerformed(evt);
             }
         });
+        getContentPane().add(Salir, new org.netbeans.lib.awtextra.AbsoluteConstraints(259, 541, 82, -1));
 
         Eliminar.setText("Eliminar");
         Eliminar.addActionListener(new java.awt.event.ActionListener() {
@@ -221,134 +222,15 @@ public class NuevoProducto extends javax.swing.JFrame {
                 EliminarActionPerformed(evt);
             }
         });
+        getContentPane().add(Eliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(259, 500, 82, -1));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 51, Short.MAX_VALUE)
-                        .addComponent(jRadioButton1)
-                        .addGap(18, 18, 18)
-                        .addComponent(jRadioButton2)
-                        .addGap(18, 18, 18)
-                        .addComponent(jRadioButton3)
-                        .addGap(18, 18, 18)
-                        .addComponent(jRadioButton4)
-                        .addGap(54, 54, 54))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(Producto)
-                            .addComponent(Marca)
-                            .addComponent(Costo)
-                            .addComponent(FechaLb)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(1, 1, 1)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel3)))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(Kilometraje)))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(DuracionSpinner)
-                                .addComponent(SugeridoSpin, javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(CantidadSpinner, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(Fecha, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Vencimiento_Date, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(Productotext)
-                                .addComponent(Marcatext)
-                                .addComponent(Costotext, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(ServicioLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(AgregarServicio)
-                        .addGap(132, 132, 132))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(29, 29, 29)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(Crear, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(Agregar, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(Aceptar, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(Eliminar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(Editar, javax.swing.GroupLayout.DEFAULT_SIZE, 82, Short.MAX_VALUE)
-                            .addComponent(Salir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(48, 48, 48)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(Producto)
-                    .addComponent(Productotext, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(Marca)
-                    .addComponent(Marcatext, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(Costo)
-                    .addComponent(Costotext, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(15, 15, 15)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(FechaLb)
-                    .addComponent(Fecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel1)
-                    .addComponent(Vencimiento_Date, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(21, 21, 21)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(CantidadSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Kilometraje))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(SugeridoSpin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2))
-                        .addGap(18, 18, 18)
-                        .addComponent(DuracionSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addGap(49, 49, 49)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jRadioButton1)
-                    .addComponent(jRadioButton2)
-                    .addComponent(jRadioButton3)
-                    .addComponent(jRadioButton4))
-                .addGap(36, 36, 36)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(ServicioLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(AgregarServicio))
-                .addGap(35, 35, 35)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(Crear)
-                    .addComponent(Agregar)
-                    .addComponent(Editar))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(Aceptar)
-                    .addComponent(Salir)
-                    .addComponent(Eliminar))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        Productotext.getAccessibleContext().setAccessibleName("Modelo");
+        DuracionCheckbox.setText("Insertar duración");
+        DuracionCheckbox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DuracionCheckboxActionPerformed(evt);
+            }
+        });
+        getContentPane().add(DuracionCheckbox, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 322, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -386,26 +268,6 @@ public class NuevoProducto extends javax.swing.JFrame {
         
         
     }//GEN-LAST:event_AgregarServicioActionPerformed
-
-    private void CrearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CrearActionPerformed
-         int cont = 0;  
-        try {
-            rs = BD.st.executeQuery("select count(Inventario_Producto) " +
-                                    "FROM inventario_has_tipo_servicio " +
-                                    "WHERE Inventario_Producto = '"+Productotext.getText()+"' AND Inventario_Marca = '"+Marcatext.getText()+"' ;");
-            rs.beforeFirst();
-            for (; rs.next();cont++);
-            if (cont>0)
-                dispose();
-            
-            else{
-                JOptionPane.showMessageDialog(null, "Debe seleccionar al menos 1 servicio. " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoProducto.class.getName()).log(Level.SEVERE, null, ex);
-        }
-               
-    }//GEN-LAST:event_CrearActionPerformed
 
     private void AceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AceptarActionPerformed
        
@@ -464,7 +326,6 @@ public class NuevoProducto extends javax.swing.JFrame {
                           }else{
                               
                                 try {
-                                    System.out.println("Entre a donde debo");
                                     rs=BD.st.executeQuery("SELECT *  FROM Inventario "
                                             + "WHERE Producto = '"+ Productotext.getText()+"' AND Marca = '"+Marcatext.getText() +"' ;");
                                     rs.beforeFirst();
@@ -494,9 +355,16 @@ public class NuevoProducto extends javax.swing.JFrame {
                                 
                           }
                             
+                            try {
+                                rs=BD.st.executeQuery("SELECT id  FROM Inventario "
+                                        + "WHERE Producto = '"+ Productotext.getText()+"' AND Marca = '"+Marcatext.getText() +"' ;");
+                                rs.beforeFirst();
+                                asociar_producto_tipo_servicio(rs.getInt("id"));
+                            } catch (SQLException ex) {
+                                Logger.getLogger(NuevoProducto.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                           
                           
-                            this.add(Crear);
                             this.add(Editar);
                             this.add(Agregar);
                             this.getContentPane().remove(Aceptar);
@@ -539,17 +407,44 @@ public class NuevoProducto extends javax.swing.JFrame {
             
             if(!lista_servicios_asociados.isEmpty()){
                 int idinv = 0 ;
+                String duracion = DuracionSpinner.getValue().toString();
                 SimpleDateFormat formato = new SimpleDateFormat("YYYY/MM/dd");
+                
+                 if (jRadioButton1.isSelected()){
+                              duracion.concat(" Días");
+                           }else{
 
-                Iterator iterador_de_lista  = lista_servicios_asociados.iterator();
+                                if (jRadioButton2.isSelected()){
+                                    duracion.concat(" Meses");;
+                                }else{
+                                        if (jRadioButton3.isSelected()){
+                                            duracion.concat(" Km");;
+                                        }else{
+                                            if (jRadioButton4.isSelected()){
+                                             duracion.concat(" Litros");;
+                                        }
+                                        }
+                                }
+                           }
+                
+
                 try {
-                    BD.st.execute("INSERT INTO `servi_cam`.`inventario` (`Producto`, `Marca`, `Costo`, "
-                            + "`Cantidad`, `Duracion`, `Sugerido`, `Fecha`, `Vencimiento`) "
-                            + "VALUES ('"+ Productotext.getText()+"', '"+ Marcatext.getText()+"', '"+ Costotext.getText()+"', "
-                            + " '"+ CantidadSpinner.getValue()+"', '"+ DuracionSpinner.getValue()+"', '"+ SugeridoSpin.getValue()+"', "
-                            + " '"+ formato.format(Fecha.getDate())+"', '"+ formato.format(Vencimiento_Date.getDate())+"');");
                     
-                    rs = BD.st.executeQuery("select last_insert_id(); ");
+                    if (DuracionCheckbox.isSelected()){
+                        BD.st.execute("INSERT INTO `servi_cam`.`inventario` (`Producto`, `Marca`, `Costo`, "
+                                + "`Cantidad`, `Duracion`, `Sugerido`, `Fecha`, `Vencimiento`) "
+                                + "VALUES ('"+ Productotext.getText()+"', '"+ Marcatext.getText()+"', '"+ Costotext.getText()+"', "
+                                + " '"+ CantidadSpinner.getValue()+"', '"+ duracion+"', '"+ SugeridoSpin.getValue()+"', "
+                                + " '"+ formato.format(Fecha.getDate())+"', '"+ formato.format(Vencimiento_Date.getDate())+"');");
+                    }else{
+                        BD.st.execute("INSERT INTO `servi_cam`.`inventario` (`Producto`, `Marca`, `Costo`, "
+                                + "`Cantidad`, `Sugerido`, `Fecha`, `Vencimiento`) "
+                                + "VALUES ('"+ Productotext.getText()+"', '"+ Marcatext.getText()+"', '"+ Costotext.getText()+"', "
+                                + " '"+ CantidadSpinner.getValue()+"', '"+ SugeridoSpin.getValue()+"', "
+                                + " '"+ formato.format(Fecha.getDate())+"', '"+ formato.format(Vencimiento_Date.getDate())+"');");
+                    }
+                    
+                    rs = BD.st.executeQuery("select last_insert_id() as id; ");
 
                     rs.beforeFirst();
 
@@ -558,23 +453,14 @@ public class NuevoProducto extends javax.swing.JFrame {
                     if (rs.next()){
                         idinv = rs.getInt("id");
                     }
-
+                    
+                    asociar_producto_tipo_servicio(idinv);
+                    
                 } catch (SQLException ex) {
                     Logger.getLogger(NuevoProducto.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
 
-                if (idinv != 0){
-                    while(iterador_de_lista.hasNext()){
-                        try {
-                            BD.st.execute("INSERT INTO Inventario_has_Tipo_Servicio"
-                                    + " VALUES ( "+idinv+" , '"+ Producto+"' , '"+ Marca+"' , "+iterador_de_lista.next()+" );");
-                        } catch (SQLException ex) {
-                            Logger.getLogger(NuevoProducto.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-
-                    }
-                }
                 
                 JOptionPane.showMessageDialog(null, "El producto fue agregado BD.con exito. " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
                 
@@ -596,6 +482,10 @@ public class NuevoProducto extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_EliminarActionPerformed
 
+    private void DuracionCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DuracionCheckboxActionPerformed
+      activar_desactivar_duracion ();
+    }//GEN-LAST:event_DuracionCheckboxActionPerformed
+
     
     public void rellenar (){
         
@@ -608,9 +498,6 @@ public class NuevoProducto extends javax.swing.JFrame {
            
            System.out.println("entre a rellenar.");
            
-
-                      
-
 
             System.out.println(Productotext.getText());
             System.out.println(Marcatext.getText());
@@ -625,7 +512,6 @@ public class NuevoProducto extends javax.swing.JFrame {
 
                       if (rs.next()){
                        
-                                this.getContentPane().remove(Crear);
                                 this.getContentPane().remove(Editar);
                                 this.Aceptar.setBounds(this.Agregar.getBounds());
                                 this.getContentPane().remove(Agregar);
@@ -682,6 +568,47 @@ public class NuevoProducto extends javax.swing.JFrame {
     }
     
     
+    public void asociar_producto_tipo_servicio (int idinv){
+        
+        
+                Iterator iterador_de_lista  = lista_servicios_asociados.iterator();
+              
+                
+                if (idinv != 0){
+                    while(iterador_de_lista.hasNext()){
+                        try {
+                            BD.st.execute("INSERT INTO inventario_has_tipo_servicio ( Inventario_id, Inventario_Producto, Inventario_Marca, Tipo_Servicio_idTipo_Servicio ) " +
+                                          "SELECT "+idinv+" , '"+ Productotext.getText()+"' , '"+ Marcatext.getText()+"' ,  "+iterador_de_lista.next()+"  " +
+                                          "FROM dual " +
+                                          "WHERE NOT EXISTS (SELECT * FROM inventario_has_tipo_servicio " +
+                                          "WHERE Inventario_id = "+idinv+" and Inventario_Producto = '"+ Productotext.getText()+"' and Inventario_Marca = '"+ Marcatext.getText()+"' )" );
+                        } catch (SQLException ex) {
+                            Logger.getLogger(NuevoProducto.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+
+                    }
+                }else{
+                     JOptionPane.showMessageDialog(null, "No se esta pasando un id de prodcuto correcto." ,"Informacion", JOptionPane.WARNING_MESSAGE);
+                }
+    }
+    
+    
+    public void activar_desactivar_duracion (){
+        if (DuracionCheckbox.isSelected()){
+          DuracionSpinner.setEnabled(true);
+          jRadioButton1.setEnabled(true);
+          jRadioButton2.setEnabled(true);
+          jRadioButton3.setEnabled(true);
+          jRadioButton4.setEnabled(true);
+        }else{
+            DuracionSpinner.setEnabled(false);
+            jRadioButton1.setEnabled(false);
+            jRadioButton2.setEnabled(false);
+            jRadioButton3.setEnabled(false);
+            jRadioButton4.setEnabled(false);
+        }
+        
+    }
     /**
      * @param args the command line arguments
      */
@@ -723,7 +650,11 @@ public class NuevoProducto extends javax.swing.JFrame {
                 } catch (UnsupportedLookAndFeelException ex) {
                     Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                new NuevoProducto().setVisible(true);
+                try {
+                    new NuevoProducto().setVisible(true);
+                } catch (SQLException ex) {
+                    Logger.getLogger(NuevoProducto.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
@@ -735,7 +666,7 @@ public class NuevoProducto extends javax.swing.JFrame {
     private javax.swing.JSpinner CantidadSpinner;
     private javax.swing.JLabel Costo;
     private javax.swing.JTextField Costotext;
-    private javax.swing.JButton Crear;
+    private javax.swing.JCheckBox DuracionCheckbox;
     private javax.swing.JSpinner DuracionSpinner;
     private javax.swing.JButton Editar;
     private javax.swing.JButton Eliminar;

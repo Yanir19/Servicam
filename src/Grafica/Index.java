@@ -339,9 +339,9 @@ public class Index extends javax.swing.JFrame {
     }//GEN-LAST:event_ConsultarPActionPerformed
 
     private void CrEdPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CrEdPActionPerformed
-            NuevoPro proveedor;
+            NuevoProveedor proveedor;
         try {
-            proveedor = new NuevoPro ();
+            proveedor = new NuevoProveedor ();
             proveedor.setVisible(true);
         } catch (SQLException ex) {
             Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
@@ -360,8 +360,14 @@ public class Index extends javax.swing.JFrame {
     }//GEN-LAST:event_ConsultarIActionPerformed
 
     private void CrEdIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CrEdIActionPerformed
-        NuevoProducto inv = new NuevoProducto();
-        inv.setVisible(true);
+        NuevoProducto inv;
+        try {
+            inv = new NuevoProducto();
+            inv.setVisible(true);
+        } catch (SQLException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }//GEN-LAST:event_CrEdIActionPerformed
 
     private void CrTSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CrTSActionPerformed

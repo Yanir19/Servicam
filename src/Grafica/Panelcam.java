@@ -170,7 +170,11 @@ public class Panelcam extends JPanel {
             else
             {
                         final Servicio serv; 
-
+                        int i = 0;
+                        int j=0;
+                        int x=20;
+                        
+                        
                          try {
 
                             serv = new  Servicio();
@@ -193,7 +197,7 @@ public class Panelcam extends JPanel {
                             invent_cont = new boolean[cont];
 
 
-                            for (int i=0; i!=cont;i++){
+                            for (i=0; i!=cont;i++){
 
                                 invent_cont [i] = new Boolean(false);
                                 proveedor [i] = new JComboBox();
@@ -208,8 +212,7 @@ public class Panelcam extends JPanel {
 
 
 
-
-                            int x=20;
+                            
                             label [0] = new JLabel ("Tipo de servicio");
                             label [0].setBounds(x, 20, 200, 30);
                             pn.add(label[0]);
@@ -235,30 +238,40 @@ public class Panelcam extends JPanel {
                             label [7].setBounds(x+=125, 20, 40, 30);
                             pn.add(label [7]);
 
-                            rs = BD.st.executeQuery("SELECT RazonSocial FROM Proveedor ;");  
+
+                            rs = BD.st.executeQuery("select Descripcion, tipo_servicio_has_proveedor.Razon_social, idTipo_Servicio " +
+                                                    "from  tipo_servicio_has_proveedor, ( " +
+                                                    "select Descripcion, idTipo_Servicio " +
+                                                    "from tipo_servicio " +
+                                                    "inner join tipo_servicio_has_automovil " +
+                                                    "on idTipo_Servicio = Tipo_Servicio_idTipo_Servicio " +
+                                                    "and Automovil_Placa = '"+ camion [fila][0] +"'" +
+                                                    "and Automovil_Model = '"+camion [fila][1] + "' ) as servi " +
+                                                    "where Tipo_Servicio_idTipo_Servicio = servi.idTipo_Servicio;");
                             rs.beforeFirst();
-
-                            int i = 0;
-                            while (rs.next())
-                            {
-                                proveedor[i].addItem(rs.getString("RazonSocial"));
-                                     
-                            }
-
-                            rs = BD.st.executeQuery("select Descripcion, idTipo_Servicio " +
-                                                "from tipo_servicio " +
-                                                "inner join tipo_servicio_has_automovil " +
-                                                "on idTipo_Servicio = Tipo_Servicio_idTipo_Servicio " +
-                                                "and Automovil_Placa = '"+ camion [fila][0] +"'" +
-                                                "and Automovil_Model = '"+camion [fila][1] + "';");  
-                            rs.beforeFirst();
-
                             final Object tipo_servi [][] = new Object [cont] [2];
-                            for ( i=0 ; rs.next(); i++)   
-                            {
+                            
+                            i=0;
+                            if (rs.next()){
                                 tipo_servi [i] [0] = rs.getString("Descripcion");
                                 tipo_servi [i] [1] = rs.getInt("idTipo_Servicio");
+                                proveedor[i].addItem(rs.getString("tipo_servicio_has_proveedor.Razon_social"));
+                                i++;
                             }
+                            
+                            while(rs.next())   
+                            {
+                                if ( rs.getInt("idTipo_Servicio") != (int) tipo_servi [i-1] [1] ){
+                                    tipo_servi [i] [0] = rs.getString("Descripcion");
+                                    tipo_servi [i] [1] = rs.getInt("idTipo_Servicio");
+                                    proveedor[i].addItem(rs.getString("tipo_servicio_has_proveedor.Razon_social"));
+                                    i++;
+                                }else{
+                                    proveedor[i].addItem(rs.getString("tipo_servicio_has_proveedor.Razon_social"));
+                                }
+                            }
+                            
+                            
 
                            
 
@@ -326,7 +339,6 @@ public class Panelcam extends JPanel {
                             serv.setContentPane(scrollpane);
 
 
-                            BD.st.close();
                             serv.boton.setBounds(800, y+30, 100, 30);
                             pn.add(serv.boton);
                              serv.setVisible(true);       
@@ -349,11 +361,15 @@ public class Panelcam extends JPanel {
                             fecha = new Date();
                             int flag = 1;
                             int k = 0;
+                            
+                                System.out.println("voy a entrar al while");
+                                System.out.println("Tamno de K: " + k);
+                                System.out.println("Tamano de cont: " + cont);
                             try{
                             while(k<cont){
-
+                                System.out.println("K : " + k);
                                 if (checkBox[k].isSelected()){
-                                    if (fecha.before(calendario[k].getDate()) && (calendario[k].getDate() != null)  ){
+                                    if (calendario[k].getDate().before(fecha) && (calendario[k].getDate() != null)  ){
 
                                             if (Integer.parseInt(km[k].getText()) < KmActual || km[k].getText() == null ){
                                                  JOptionPane.showMessageDialog(null, "El kilometraje no puede ser menor que el actual " ,"Informacion", JOptionPane.INFORMATION_MESSAGE); 
@@ -367,13 +383,15 @@ public class Panelcam extends JPanel {
                                             } 
 
                                     }else{
-                                        JOptionPane.showMessageDialog(null, "La Fecha introducida no puede ser menor que la actual " ,"Informacion", JOptionPane.INFORMATION_MESSAGE); 
+                                        JOptionPane.showMessageDialog(null, "La Fecha introducida no puede ser mayor que la actual " ,"Informacion", JOptionPane.INFORMATION_MESSAGE); 
                                         flag = 0;
                                     }
-                                     k++;
                                 }
+                                k++;
                             }
-                             }
+                            
+                                System.out.println("Sali del while");
+                            }
                                 catch(Exception exc){
                                     JOptionPane.showMessageDialog(null, exc,"Informacion", JOptionPane.WARNING_MESSAGE); 
                                      flag = 0;
@@ -401,10 +419,10 @@ public class Panelcam extends JPanel {
                                               +Proveedor[2]+"','"+Proveedor[4]+"','"
                                               +Proveedor[5]+"');");
                                   } catch (SQLException ex) {
-                                      Logger.getLogger(NuevoPro.class.getName()).log(Level.SEVERE, null, ex);
+                                      Logger.getLogger(NuevoProveedor.class.getName()).log(Level.SEVERE, null, ex);
                                   }
 
-
+                                   System.out.println("Ya se inserto el servicio");
                                    try {
                                        rs = BD.st.executeQuery("SELECT idServicios FROM servicios WHERE fecha = '"+Proveedor[1]+"' AND costo = '"+Proveedor[2]+"' AND Km = '"+Proveedor[4]+"' ;");
                                    } catch (SQLException ex) {
@@ -422,18 +440,16 @@ public class Panelcam extends JPanel {
 
                                    }
                                    try {
-                                       rs.close();
 
                                         try {
                                        BD.st.execute("INSERT INTO servicios_has_automovil VALUES ('"+data[0]+"','"+camion [fila][0]+"','"
                                        +camion [fila][1]+"')");
                                        } catch (SQLException ex) {
-                                       Logger.getLogger(NuevoPro.class.getName()).log(Level.SEVERE, null, ex);
+                                       Logger.getLogger(NuevoProveedor.class.getName()).log(Level.SEVERE, null, ex);
                                        }
 
-
-                                        rs.close();
-
+                                        System.out.println("Ya se inserto el servicios_has_automovil");
+                                        
 
                                          rs = BD.st.executeQuery(" SELECT idTipo_Servicio "+ 
                                                               "FROM tipo_servicio_has_automovil, tipo_servicio "+
@@ -444,13 +460,11 @@ public class Panelcam extends JPanel {
                                        {
                                            data [1] = rs.getInt("idTipo_Servicio");
                                        }
-
-
-                                       rs.close();
-
+                                         
                                        BD.st.execute("INSERT INTO servicios_has_tipo_servicio VALUES ('"+data[0]+"','"+data[1]+"') ;");     
 
-
+                                       System.out.println("Ya se inserto el servicios_has_tipo_servicio");
+                                       
                                         rs = BD.st.executeQuery("SELECT Rif FROM proveedor WHERE RazonSocial= '"+Proveedor[6]+"' ;" );
 
                                              while (rs.next())
@@ -459,17 +473,10 @@ public class Panelcam extends JPanel {
                                            data [2] = rs.getString("Rif");
                                        }
 
-                                       rs.close();
-
                                        BD.st.execute("INSERT INTO proveedor_has_servicios VALUES ('" +data[2]+ "','"+data[0]+"') ;");
-
-
-                                       try {
-                                       rs.close();
-
-                                       } catch (SQLException ex) {
-                                       Logger.getLogger(NuevoPro.class.getName()).log(Level.SEVERE, null, ex);
-                                       }
+                                       
+                                       System.out.println("Ya se inserto el proveedor_has_servicios");
+                                       
                                    } catch (SQLException ex) {
 
                                    }
@@ -689,25 +696,32 @@ public class Panelcam extends JPanel {
                 }
                 i=j;
                 
-                cont =j;
+                cont = j;
+                
+                
+                
                 data2 = new Object [j] [7];
 
-                
-                   try{
-               rs = BD.st.executeQuery ("SELECT distinct  ts.Descripcion, ser.Fecha, ta.Tiempo, ta.Km, ser.Km, ts.idTipo_Servicio " +
-                                        "FROM   servicios as ser, tipo_servicio as ts, " +
-                                        "(select Tipo_Servicio_idTipo_Servicio, Servicios_idServicios as Servicios, Fecha " +
-                                        "from  " +
-                                        "(select *FROM servicios_has_tipo_servicio as st, servicios_has_automovil as sa, servicios " +
-                                        "WHERE sa.Automovil_Placa = '" + camion [fila] [0] + "'  AND sa.Automovil_Model = '"+ camion [fila] [1]+"'  AND  st.Servicios_idServicios = sa.idServicios_auto  " +
-                                        "and st.Servicios_idServicios = idServicios " +
-                                        "group by Tipo_Servicio_idTipo_Servicio, Fecha desc, Km desc) x " +
-                                        "group by Tipo_Servicio_idTipo_Servicio ) as table1,  " +
-                                        "tipo_servicio_has_automovil as ta  " +
-                                        "WHERE  ser.idServicios = table1.Servicios and ts.idTipo_Servicio = table1.Tipo_Servicio_idTipo_Servicio and " +
-                                        "ta.Automovil_Placa =  '"+ camion [fila] [0]+"'  and ta.Automovil_Model =  '"+ camion [fila] [1] +"'  and ta.Tipo_Servicio_idTipo_Servicio = ts.idTipo_Servicio; ");
-                            
-                }catch (SQLException ex) {
+                    
+                    
+                try{
+                    rs = BD.st.executeQuery ("SELECT distinct  ts.Descripcion, x2.Fecha, ta.Tiempo, ta.Km, x2.Km, ts.idTipo_Servicio " +
+                                            "FROM  tipo_servicio as ts, " +
+                                            "(select * " +
+                                            "from  " +
+                                            "(select *FROM servicios_has_tipo_servicio as st, servicios_has_automovil as sa, servicios " +
+                                            "WHERE sa.Automovil_Placa =  '" + camion [fila] [0] +"' AND sa.Automovil_Model =  '" + camion [fila] [1] +"' AND  st.Servicios_idServicios = sa.idServicios_auto  " +
+                                            "and st.Servicios_idServicios = idServicios " +
+                                            "group by Tipo_Servicio_idTipo_Servicio, Fecha desc, Km) x " +
+                                            "group by Tipo_Servicio_idTipo_Servicio) x2, " +
+                                            "tipo_servicio_has_automovil as ta  " +
+                                            "WHERE   ts.idTipo_Servicio = x2.Tipo_Servicio_idTipo_Servicio " +
+                                            "and ta.Automovil_Placa =   '" + camion [fila] [0] +"' " +
+                                            "and ta.Automovil_Model =   '" + camion [fila] [1] +"'  " +
+                                            "and ta.Tipo_Servicio_idTipo_Servicio = ts.idTipo_Servicio  " +
+                                            "group by  x2.Fecha desc, x2.Km  desc;" );
+
+                   }catch (SQLException ex) {
                    JOptionPane.showMessageDialog(null, ex.getMessage() ,"Informacion", JOptionPane.WARNING_MESSAGE);
                    Logger.getLogger(NuevoProducto.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -715,28 +729,27 @@ public class Panelcam extends JPanel {
 
                 rs.beforeFirst();
                 
-         
+                
+                
                 j=0;    
                 
                 while (rs.next())
                 {
-                    
                     data2 [j][0]= rs.getString("ts.Descripcion");
                     data2 [j][1]= formato.format(rs.getDate("Fecha"));
                     data2 [j][2]= rs.getString("ta.Tiempo");
                     data2 [j][3]= rs.getInt("ta.Km");
                     data2 [j][4]= rs.getInt("ts.idTipo_Servicio");
-                    data2 [j][5]= rs.getInt("ser.Km");
+                    data2 [j][5]= rs.getInt("x2.Km");
                     data2 [j][6]= rs.getDate("Fecha");
                     label[7].setText( data2 [j][5].toString() + " Km.");
                     KmActual = (int) data2 [j][5];
                     j++;
                     
-                
                 }
                   
 
-
+                
 
 
 
@@ -762,12 +775,17 @@ public class Panelcam extends JPanel {
 
                             posicion=0;
                        }
-
-                       if (calendar.before(fecha_actual)){ 
-                           data2 [j][2]= "Falta servicio";
-                           est_serv = false;
+                       
+                        System.out.println("esto es lo que contiene palabra : " + palabra);
+                       if (Integer.parseInt(palabra) > 0){
+                            if (calendar.before(fecha_actual)){ 
+                                data2 [j][2]= "Falta servicio";
+                                est_serv = false;
+                            }else{
+                                data2 [j][2]= formato.format(calendar.getTime());
+                            }
                        }else{
-                           data2 [j][2]= formato.format(calendar.getTime());
+                           data2 [j][2]= "Tiempo indefinido.";
                        }
 
                     }else{
@@ -775,14 +793,16 @@ public class Panelcam extends JPanel {
                         if(data2 [j][3]!=null){
                             Km += ((int) data2 [j][3]+ (int) data2 [j][5]) ;
                              palabra = label[7].getText().substring(0,label[7].getText().indexOf(" Km."));
-                            
-                            if (Integer.parseInt(palabra = label[7].getText().substring(0,label[7].getText().indexOf(" Km.") ))>=Km ){
-                                data2 [j][2] = "Falta servicio";
-                                est_serv = false;
+                            if (Km >0){
+                                if (Integer.parseInt(palabra = label[7].getText().substring(0,label[7].getText().indexOf(" Km.") ))>=Km ){
+                                    data2 [j][2] = "Falta servicio";
+                                    est_serv = false;
+                                }
+                                else
+                                    data2 [j][2] = Km + " Km";
+                            }else{
+                                data2 [j][2]= "Kilometraje indefinido.";
                             }
-                            else
-                                data2 [j][2] = Km + " Km";
-
                         }
                     }   
                     Km = 0;

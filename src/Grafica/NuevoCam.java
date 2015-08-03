@@ -14,8 +14,10 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -28,12 +30,15 @@ public class NuevoCam extends javax.swing.JFrame {
     private Serviciosasociados serv;
     private ResultSet rs = null;
     private static manejador_bd BD;
+    private  static ArrayList lista_servicios_asociados = new ArrayList(); 
     
     public NuevoCam() throws SQLException {
         initComponents();
         this.setTitle("Crear un nuevo camión.");
         serv = new Serviciosasociados();
         BD = new manejador_bd();
+        getContentPane().remove(atrasbtn);
+        getContentPane().remove(aceptarbtn);
     }
 
     
@@ -53,11 +58,14 @@ public class NuevoCam extends javax.swing.JFrame {
         Chofertext = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         Kilometrajespin = new javax.swing.JSpinner();
-        Editarbtn = new java.awt.Button();
-        Asociarbtn = new java.awt.Button();
-        CrearCamionbtn = new java.awt.Button();
         jLabel2 = new javax.swing.JLabel();
         Jdate = new com.toedter.calendar.JDateChooser();
+        salirbtn = new javax.swing.JButton();
+        CrearCamionbtn = new javax.swing.JButton();
+        Editarbtn = new javax.swing.JButton();
+        Asociarbtn = new javax.swing.JButton();
+        atrasbtn = new javax.swing.JButton();
+        aceptarbtn = new javax.swing.JButton();
 
         jTextField1.setText("jTextField1");
 
@@ -79,47 +87,56 @@ public class NuevoCam extends javax.swing.JFrame {
             }
         });
 
+        Chofertext.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ChofertextActionPerformed(evt);
+            }
+        });
+
         jLabel1.setText("Servicios");
 
-        Editarbtn.setActionCommand("Editar");
-        Editarbtn.setLabel("Editar");
-        Editarbtn.addActionListener(new java.awt.event.ActionListener() {
+        jLabel2.setText("Fecha");
+
+        salirbtn.setText("Salir");
+        salirbtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                EditarbtnActionPerformed(evt);
+                salirbtnActionPerformed(evt);
             }
         });
 
-        Asociarbtn.setActionCommand("Asociarbtn");
-        Asociarbtn.setLabel("Asociar Servicios");
-        Asociarbtn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                AsociarbtnActionPerformed(evt);
-            }
-        });
-
-        CrearCamionbtn.setActionCommand("Crearcamionbtn");
-        CrearCamionbtn.setLabel("Crear Camión");
+        CrearCamionbtn.setText("Crear Camión");
         CrearCamionbtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 CrearCamionbtnActionPerformed(evt);
             }
         });
 
-        jLabel2.setText("Fecha");
+        Editarbtn.setText("Editar");
+        Editarbtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                EditarbtnActionPerformed(evt);
+            }
+        });
+
+        Asociarbtn.setText("Asociar servicios");
+        Asociarbtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AsociarbtnActionPerformed(evt);
+            }
+        });
+
+        atrasbtn.setText("Atras");
+
+        aceptarbtn.setText("Aceptar");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(34, 34, 34)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGap(31, 31, 31)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(15, 15, 15)
-                        .addComponent(CrearCamionbtn, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(Editarbtn, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(Model)
                             .addComponent(Placa)
@@ -132,25 +149,41 @@ public class NuevoCam extends javax.swing.JFrame {
                             .addComponent(Modelotext, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
                             .addComponent(Placatext)
                             .addComponent(Chofertext)
-                            .addComponent(Asociarbtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(Kilometrajespin, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(Jdate, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(0, 0, Short.MAX_VALUE)))))
-                .addGap(25, 25, 25))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(Asociarbtn)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(Kilometrajespin, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(Jdate, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(0, 0, Short.MAX_VALUE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(CrearCamionbtn)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(10, 10, 10)
+                                .addComponent(atrasbtn)))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(aceptarbtn)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(Editarbtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(18, 18, 18)
+                                .addComponent(salirbtn)))))
+                .addGap(28, 28, 28))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(48, 48, 48)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(Model)
-                    .addComponent(Modelotext, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addGap(24, 24, 24)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(Placa)
                     .addComponent(Placatext, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Model)
+                    .addComponent(Modelotext, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(Chofer)
@@ -163,15 +196,20 @@ public class NuevoCam extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2)
                     .addComponent(Jdate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(21, 21, 21)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(Asociarbtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(23, 23, 23)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(Editarbtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(CrearCamionbtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(44, 44, 44))
+                    .addComponent(Asociarbtn))
+                .addGap(35, 35, 35)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(CrearCamionbtn)
+                    .addComponent(salirbtn)
+                    .addComponent(Editarbtn))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(atrasbtn)
+                    .addComponent(aceptarbtn))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         Modelotext.getAccessibleContext().setAccessibleName("Modelo");
@@ -179,83 +217,137 @@ public class NuevoCam extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void conexion (){
-         try {
-            try {
-                Class.forName("com.mysql.jdbc.Driver").newInstance();
-            } catch (InstantiationException ex) {
-                Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            BD.con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            BD.st  = BD.con.createStatement();
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
     
-    private void EditarbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditarbtnActionPerformed
+    private void ModelotextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ModelotextActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ModelotextActionPerformed
 
-        Button btn = new Button("Aceptar.");
-        btn.setBounds(100, 280, 100, 30);
-        this.add(btn);
-        this.getContentPane().remove(Editarbtn);
-        this.getContentPane().remove(CrearCamionbtn);
-         final String Pl, Ml;
-         Pl = Placatext.getText();
-         Ml = Modelotext.getText();
+    private void CrearCamionbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CrearCamionbtnActionPerformed
+             
+        
+           boolean flag = false;
+        Object camion [] = new Object [5];
+        camion [0]= Placatext.getText();
+        camion [1]= Modelotext.getText();
+        camion [2]= Chofertext.getText();
+        camion [3] =Kilometrajespin.getValue();
+        
+        
+        if ( !camion [1].equals("") ){
+           if(!camion [0].equals("")){
+               if( (int)camion [3] >= 0){   
+                   if(Jdate.getDate()!= null){   
+                       SimpleDateFormat formato = new SimpleDateFormat("YYYY/MM/dd");
+                       camion [4] = formato.format(Jdate.getDate());
+                       flag =true;
+                    }else{
+                        JOptionPane.showMessageDialog(null, "El campo 'Fecha' no puede estar vacío " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
+                    }     
+                }else{
+                    JOptionPane.showMessageDialog(null, "El campo 'Kilometraje' no puede ser negativo " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
+                }     
+            }else{
+                JOptionPane.showMessageDialog(null, "El campo 'Placa' no puede estar vacío " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
+            }     
+        }else{
+            JOptionPane.showMessageDialog(null, "El campo 'Modelo' no puede estar vacío " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
+        }
+        
+        
+        
+        
+       if (flag){
+      
+       
+       int cont = 0 ;
+       int i = 0;
+        try {
+            BD.st.execute("INSERT INTO automovil VALUES ('"+camion[0]+"','"+camion[1]+"','"
+                    +camion[2]+"',"+camion[3]+",'"+camion[4]+"') ; ");
+        } catch (SQLException ex) {
+            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
+            
+        }
+        
+        
+        try {
+            Asociar_camion_con_servicios();
+        } catch (SQLException ex) {
+            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
+        }
+      
+              JOptionPane.showMessageDialog(null, "Su camión fue creado exitosamente. " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
+       }
+
+    }//GEN-LAST:event_CrearCamionbtnActionPerformed
+
+    private void EditarbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditarbtnActionPerformed
+    
+        
+        final String Pl;
+        Pl = Placatext.getText();
          
         try {
-            rs= BD.st.executeQuery("SELECT * FROM automovil WHERE Placa = '"+ Pl + "'  AND Model = '" + Ml + "' ; ");
+            rs= BD.st.executeQuery("SELECT * FROM automovil WHERE Placa = '"+ Pl + "' ; ");
+            rs.beforeFirst();
         } catch (SQLException ex) {
             Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         try {
-            while (rs.next()){
+            if(rs.next()){
+                
+                JButton btn = new JButton("Aceptar");
+               
+                btn.setBounds(Editarbtn.getBounds());
+                this.add(btn);
+                this.getContentPane().remove(Editarbtn);
+                this.getContentPane().remove(CrearCamionbtn);
+                repaint();
+                
+                Modelotext.setText(rs.getString("Model"));
                 Chofertext.setText(rs.getString("Chofer"));
                 Kilometrajespin.setValue (rs.getInt("Km"));
                 SimpleDateFormat formato = new SimpleDateFormat("YYYY/MM/dd");
                 Jdate.setDate(rs.getDate("FechaCompra"));
+
+                btn.addActionListener( new ActionListener() {
+                    
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        
+                        try {
+                            Asociar_camion_con_servicios();
+                        } catch (SQLException ex) {
+                            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        
+                        
+                        try {
+                            BD.st.execute("UPDATE automovil"
+                                    + " SET Placa = '" + Placatext.getText() + "' , Model = '" + Modelotext.getText() + "' , "
+                                    + "Chofer = '" + Chofertext.getText() + "' , Km = " + Kilometrajespin.getValue()
+                                    + " WHERE Placa = '"+ Pl +"' AND Model = '"+ Modelotext.getText() + "' ; ");
+                        } catch (SQLException ex) {
+                            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        
+                        
+                    }
+                    
+                });
+                
+            }else{
+                JOptionPane.showMessageDialog(null, "La placa ingresada no existe en la base de datos." ,"Informacion", JOptionPane.WARNING_MESSAGE);
             }
         } catch (SQLException ex) {
             Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
         }
-        btn.addActionListener( new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            
-                try {
-                    BD.st.execute("UPDATE automovil"
-                            + " SET Placa = '" + Placatext.getText() + "' , Model = '" + Modelotext.getText() + "' , "
-                            + "Chofer = '" + Chofertext.getText() + "' , Km = " + Kilometrajespin.getValue()
-                            + " WHERE Placa = '"+ Pl +"' AND Model = '"+ Ml + "' ; ");
-                } catch (SQLException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                   
-            dispose();
-            
-            }
-            
-        });
-        /*
        
-        */ // TODO add your handling code here:
     }//GEN-LAST:event_EditarbtnActionPerformed
 
     private void AsociarbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AsociarbtnActionPerformed
-        boolean flag = false;
+           boolean flag = false;
         Object camion [] = new Object [5];
         camion [0]= Placatext.getText();
         camion [1]= Modelotext.getText();
@@ -290,13 +382,6 @@ public class NuevoCam extends javax.swing.JFrame {
       
        
        int cont = 0 ;
-   
-        try {
-            BD.st.execute("INSERT INTO automovil VALUES ('"+camion[0]+"','"+camion[1]+"','"
-                    +camion[2]+"',"+camion[3]+",'"+camion[4]+"') ; ");
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-        }
         
         try {
             rs=BD.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " +
@@ -318,7 +403,7 @@ public class NuevoCam extends javax.swing.JFrame {
               try {
   
                 serv.setFlag(false);
-                serv.AgregarServicioCamionNuevo(Placatext.getText(), Modelotext.getText(), (int) Kilometrajespin.getValue(), Jdate.getDate() );
+                lista_servicios_asociados = serv.AgregarServicioCamionNuevo(Placatext.getText(),lista_servicios_asociados );
                 serv.setVisible(true);
                 
             } catch (SQLException ex) {
@@ -333,7 +418,7 @@ public class NuevoCam extends javax.swing.JFrame {
         
             try {
                 serv.setFlag(false);
-                serv.AgregarServicioCamion(Placatext.getText(), Modelotext.getText());
+                    lista_servicios_asociados =  serv.AgregarServicioCamion(Placatext.getText(), lista_servicios_asociados);
                 serv.setVisible(true);
             } catch (SQLException ex) {
                 Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
@@ -343,38 +428,76 @@ public class NuevoCam extends javax.swing.JFrame {
           
           
        }
-       
-       
+        // TODO add your handling code here:
     }//GEN-LAST:event_AsociarbtnActionPerformed
 
-    private void CrearCamionbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CrearCamionbtnActionPerformed
-        
-        
-        int cont =0;
-        try {
-            rs=BD.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio" +
-                    " FROM tipo_servicio_has_automovil as ta"+
-                    " WHERE ta.Automovil_Placa = '"+ Placatext.getText()  +"' AND ta.Automovil_Model = '"+ Modelotext.getText() +"' ; ");
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            for (cont = 0; rs.next();cont++);
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-         if (cont>0){
-             dispose();
-             cont = 0;
-         }else
-             JOptionPane.showMessageDialog(null, "No se ha seleccionado ningun servicio" ,"Mensaje Plano", JOptionPane.ERROR_MESSAGE);
-            
-    }//GEN-LAST:event_CrearCamionbtnActionPerformed
+    private void salirbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_salirbtnActionPerformed
+     dispose();
+    }//GEN-LAST:event_salirbtnActionPerformed
 
-    private void ModelotextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ModelotextActionPerformed
+    private void ChofertextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ChofertextActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_ModelotextActionPerformed
+    }//GEN-LAST:event_ChofertextActionPerformed
+
+  private void  Asociar_camion_con_servicios () throws SQLException{
+        
+     System.out.println("Entre a asociar");
+     System.out.println("tamano de lista : " + lista_servicios_asociados.size());
+    for (int i = 0; i+2 <=  lista_servicios_asociados.size(); i+=3 ){
+            
+        System.out.println("Contenido de lista : " + lista_servicios_asociados.get(i) + "posicion : " + i );
+        
+        switch ((int)lista_servicios_asociados.get(i)) {
+
+            case 1:
+                System.out.println("case 1");
+                System.out.println("tiempo : " + lista_servicios_asociados.get(i+2));
+                System.out.println("Placa : "  + Placatext.getText());
+                System.out.println("Modelo : " + Modelotext.getText());
+                BD.st.execute("INSERT INTO tipo_servicio_has_automovil"
+                                    + "  (Tipo_Servicio_idTipo_Servicio,Automovil_Placa, Automovil_Model, Tiempo)"
+                                    + " VALUES ("+lista_servicios_asociados.get(i+1)+",'"+Placatext.getText()+"','"+Modelotext.getText()+"' ,'"+ lista_servicios_asociados.get(i+2) +"');");
+                break;
+
+            case 2:
+                System.out.println("case 2");
+                System.out.println("tiempo : " + lista_servicios_asociados.get(i+2));
+                System.out.println("Placa : "  + Placatext.getText());
+                System.out.println("Modelo : " + Modelotext.getText());
+                BD.st.execute("INSERT INTO tipo_servicio_has_automovil"
+                                + "  (Tipo_Servicio_idTipo_Servicio,Automovil_Placa, Automovil_Model, Km)"
+                                + " VALUES ("+lista_servicios_asociados.get(i+1)+",'"+Placatext.getText()+"','"+Modelotext.getText()+"' ,'"+ lista_servicios_asociados.get(i+2) +" km');");
+                break;
+
+            case 3:
+                
+                System.out.println("case 3");
+                System.out.println("tiempo : " + lista_servicios_asociados.get(i+2));
+                System.out.println("Placa : "  + Placatext.getText());
+                System.out.println("Modelo : " + Modelotext.getText());
+                BD.st.execute("UPDATE tipo_servicio_has_automovil"
+                                    + " SET Km = '" + lista_servicios_asociados.get(i+2) + "', Tiempo = NULL "
+                                    + " WHERE Automovil_Placa = '"+ Placatext.getText() +"' AND Automovil_Model = '"+ Modelotext.getText() +"' AND Tipo_Servicio_idTipo_Servicio = '" +lista_servicios_asociados.get(i+1) +"'; ");
+
+                break;
+
+            case 4:
+                System.out.println("case 4");
+                System.out.println("tiempo : " + lista_servicios_asociados.get(i+2));
+                System.out.println("Placa : "  + Placatext.getText());
+                System.out.println("Modelo : " + Modelotext.getText());
+                BD.st.execute("UPDATE tipo_servicio_has_automovil"
+                                    + " SET Tiempo = '" + lista_servicios_asociados.get(i+2) + "' , Km = NULL"
+                                    + " WHERE Automovil_Placa = '"+ Placatext.getText() +"' AND Automovil_Model = '"+ Modelotext.getText()+"' AND Tipo_Servicio_idTipo_Servicio = '" +lista_servicios_asociados.get(i+1) +"'; ");
+                break;
+        }
+        
+    }
+    
+    lista_servicios_asociados.clear();
+
+}
+
 
     /**
      * @param args the command line arguments
@@ -429,11 +552,11 @@ public class NuevoCam extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private java.awt.Button Asociarbtn;
+    private javax.swing.JButton Asociarbtn;
     private javax.swing.JLabel Chofer;
     private javax.swing.JTextField Chofertext;
-    private java.awt.Button CrearCamionbtn;
-    private java.awt.Button Editarbtn;
+    private javax.swing.JButton CrearCamionbtn;
+    private javax.swing.JButton Editarbtn;
     private com.toedter.calendar.JDateChooser Jdate;
     private javax.swing.JLabel Kilometraje;
     private javax.swing.JSpinner Kilometrajespin;
@@ -441,9 +564,12 @@ public class NuevoCam extends javax.swing.JFrame {
     private javax.swing.JTextField Modelotext;
     private javax.swing.JLabel Placa;
     private javax.swing.JTextField Placatext;
+    private javax.swing.JButton aceptarbtn;
+    private javax.swing.JButton atrasbtn;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField3;
+    private javax.swing.JButton salirbtn;
     // End of variables declaration//GEN-END:variables
 }

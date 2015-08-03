@@ -7,6 +7,7 @@
 package Grafica;
 
 import Objetos.manejador_bd;
+import Objetos.servicios_camion;
 import java.awt.BorderLayout;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
@@ -45,8 +46,10 @@ public class Serviciosasociados extends javax.swing.JFrame {
     private static manejador_bd BD;
     private ResultSet rs = null;
     public boolean bandera =false;
-    private static ArrayList lista = new ArrayList ();
-    
+    private static ArrayList lista_productos = new ArrayList ();
+    private static ArrayList lista_camiones = new ArrayList ();
+    private static ArrayList lista_proveedores = new ArrayList ();
+    private static int index_auxiliar;
     public boolean getFlag() {
         return bandera;
     }
@@ -64,11 +67,11 @@ public class Serviciosasociados extends javax.swing.JFrame {
         
     }
     
-    public ArrayList  AgregarProducto (final int idinv , final String Producto, final String Marca, ArrayList argumento_lista) throws SQLException{
+    public ArrayList  AgregarProducto (final int idinv , final String Producto, final String Marca, ArrayList argumento_lista_productos) throws SQLException{
         
         
         int cont =0;
-        this.lista = argumento_lista;
+        this.lista_productos = argumento_lista_productos;
         System.out.println("Prodcuto : " + Producto);
         System.out.println("Marca : " + Marca);
         
@@ -147,7 +150,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                 }
                                 }else{
                                     for (int k = 0; k<cont; k++){
-                                        if (lista.contains(id [i])){
+                                        if (lista_productos.contains(id [i])){
                                            checkBox [i].setSelected(true);
                                         }        
                                     }
@@ -173,7 +176,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                         public void actionPerformed(ActionEvent e) {
 
                             
-                            lista.clear();
+                            lista_productos.clear();
                             boolean flag2 = false;
                             int flag = 0;
                             System.out.println("Esto es F " + f);
@@ -207,7 +210,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                                 flag2= true;
                                                     System.out.println("Estoy en el elemento: " + j + "id : " + id[j] );
                                       
-                                                    lista.add((int) id[j]);
+                                                    lista_productos.add((int) id[j]);
                                                  
                                                 
                                             }else{
@@ -234,17 +237,16 @@ public class Serviciosasociados extends javax.swing.JFrame {
                         
                     });
                             
-    return lista;
+    return lista_productos;
    }
     
     
-    public void AgregarServicioCamion (final String Placa, final String Modelo) throws SQLException{
+    public ArrayList AgregarServicioCamion (final String Placa, ArrayList lista) throws SQLException{
          
         int cont =0;
-        
-       
-                
-            
+        lista_camiones = lista;       
+        final servicios_camion componentes [];    
+        final int id [];
             ResultSet rs = null;
             
                         rs=BD.st.executeQuery("SELECT Descripcion FROM tipo_servicio ;");
@@ -256,35 +258,32 @@ public class Serviciosasociados extends javax.swing.JFrame {
                             }
 
 
-                    final  JCheckBox checkBox[] = new JCheckBox [cont] ;
-                    final  JLabel tipo [] = new JLabel [cont];
-                    final JSpinner spin [] = new JSpinner [cont];
-                    final JComboBox combo [] = new JComboBox[cont];
-                    final int id []= new int [cont];
+                     componentes  = new servicios_camion [cont] ;
+                     id = new int [cont];
+                    
                      rs=BD.st.executeQuery("SELECT idTipo_Servicio, Descripcion FROM tipo_servicio ;");
                         rs.beforeFirst();
 
                             int y= 20;
                             
-                            for (int i =0;rs.next();i++ )
+                            for (int  i =0;rs.next();i++ )
                             {
-
-                                tipo [i] = new JLabel (rs.getString("Descripcion"));
+                                
+                                componentes [i] = new servicios_camion();
                                 id [i] = rs.getInt("idTipo_Servicio");
-                                tipo [i].setBounds(50,y, 200, 30);
-                                this.add(tipo [i]);
-                                checkBox[i] = new JCheckBox () ;
-                                checkBox [i].setBounds(20,y, 20, 30);
-                                this.add(checkBox[i]);
-                                spin [i] = new JSpinner ();
-                                spin [i].setBounds(230 , y, 80, 30);
-                                this.add(spin [i]);
-                                combo [i] = new JComboBox ();
-                                combo [i].addItem("Días");
-                                combo [i].addItem("Meses");
-                                combo [i].addItem("Km");
-                                combo [i].setBounds(320, y, 100, 30);
-                                this.add(combo [i]);
+                                index_auxiliar = i;
+                                componentes [i].descripcion_servicio.setText(rs.getString("Descripcion"));
+                                componentes [i].descripcion_servicio.setBounds(50,y, 200, 30);
+                                this.add(componentes [i].descripcion_servicio);
+                                componentes [i].servicio.setBounds(20,y, 20, 30);
+                                this.add(componentes [i].servicio);
+                                componentes [i].cantidad.setBounds(230 , y, 80, 30);
+                                this.add(componentes [i].cantidad);
+                                componentes [i].unidades.addItem("Días");
+                                componentes [i].unidades.addItem("Meses");
+                                componentes [i].unidades.addItem("Km");
+                                componentes [i].unidades.setBounds(320, y, 100, 30);
+                                this.add(componentes [i].unidades);
                                 y+=30;
                             }
                             
@@ -293,7 +292,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                             
                             rs=BD.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " + 
                                     " FROM tipo_servicio, automovil ,tipo_servicio_has_automovil as ta"+
-                                    " WHERE ta.Automovil_Placa = '"+ Placa +"' AND ta.Automovil_Model = '"+ Modelo +"' AND idTipo_Servicio  = ta.Tipo_Servicio_idTipo_Servicio; ");
+                                    " WHERE ta.Automovil_Placa = '"+ Placa +"' AND idTipo_Servicio  = ta.Tipo_Servicio_idTipo_Servicio; ");
                             
                             rs.beforeFirst();
                              for (cont = 0; rs.next(); cont++);
@@ -304,7 +303,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                             
                             rs=BD.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion, Tiempo, ta.Km " + 
                                     " FROM tipo_servicio, automovil ,tipo_servicio_has_automovil as ta"+
-                                    " WHERE ta.Automovil_Placa = '"+ Placa +"' AND ta.Automovil_Model = '"+ Modelo +"' AND idTipo_Servicio  = ta.Tipo_Servicio_idTipo_Servicio; ");
+                                    " WHERE ta.Automovil_Placa = '"+ Placa +"' AND idTipo_Servicio  = ta.Tipo_Servicio_idTipo_Servicio; ");
                             
                             rs.beforeFirst();
                             
@@ -328,28 +327,28 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                     if (id[i] <=  (int) id2[0][aux-1]){
                                         for (int j = 0; j<aux; j++){
                                             if (id [i] == (int ) id2[0][j]){
-                                                System.out.println("entre");
-                                                checkBox [i].setSelected(true);
-
+                                                componentes [i].servicio.setSelected(true);
+                                                
+                                                
                                                 if ( (int) id2[3][j]  > 0){
-                                                     spin [i].setValue((int) id2[3][j]);
-                                                     combo [i].setSelectedItem("Km");
+                                                     componentes [i].cantidad.setValue((int) id2[3][j]);
+                                                     componentes [i].unidades.setSelectedItem("Km");
                                                 }else{
                                                     System.out.println(id2[2][j]);
-                                                   index =  id2[2][j].toString().indexOf(" Días"); 
+                                                    index =  id2[2][j].toString().indexOf(" Días"); 
 
                                                    if (index >0){
                                                        System.out.println(id2[2][j].toString().substring(0, index).toString());
-                                                       spin [i].setValue(Integer.parseInt(id2[2][j].toString().substring(0, index).toString()));  
+                                                       componentes [i].cantidad.setValue(Integer.parseInt(id2[2][j].toString().substring(0, index).toString()));  
 
-                                                       combo [i].setSelectedItem("Días");  
+                                                       componentes [i].unidades.setSelectedItem("Días");  
                                                        index = 0;
                                                     }else{
 
                                                        index = id2[2][j].toString().indexOf(" Meses"); 
 
-                                                       spin [i].setValue( Integer.parseInt(id2[2][j].toString().substring(0, index).toString()));
-                                                       combo [i].setSelectedItem("Meses");   
+                                                       componentes [i].cantidad.setValue( Integer.parseInt(id2[2][j].toString().substring(0, index).toString()));
+                                                       componentes [i].unidades.setSelectedItem("Meses");   
                                                        index = 0;
                                                    }
                                                 }
@@ -365,7 +364,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                             this.add(btn);
 
           
-                            btn.addActionListener(new ActionListener() {
+                        btn.addActionListener(new ActionListener() {
 
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -377,15 +376,15 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                     String tiempo = "";
                                     for (int j=0; j<f; j++ ){
                                        
-                                        if ( checkBox[j].isSelected() ){
-                                            tiempo = spin[j].getValue().toString() + " " + combo [j].getSelectedItem();
+                                        if ( componentes [j].servicio.isSelected() ){
+                                            tiempo = componentes [j].cantidad.getValue().toString() + " " + componentes [j].unidades.getSelectedItem();
                                              flag = 1;
                                             if (aux >0){
                                             if (id[j] <=  (int) id2[0][aux-1] ){
                                                 for (int k = 0; k<aux; k++){
                                                     if (id [j] == (int ) id2[0][k]){
                                                         
-                                                        if(combo [j].getSelectedItem().equals("Días") || combo [j].getSelectedItem().equals("Meses")){
+                                                        if(componentes [j].unidades.getSelectedItem().equals("Días") || componentes [j].unidades.getSelectedItem().equals("Meses")){
                                                             
                                                              if (!tiempo.equals( id2[2][k]) ){ 
                                                                 flag = 3;
@@ -393,7 +392,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                                                   flag = 4;
                                                              }
                                                         }else{
-                                                            if( (int) spin[j].getValue() != (int) id2[3] [k]){
+                                                            if( (int) componentes [j].cantidad.getValue() != (int) id2[3] [k]){
                                                                 flag = 2;
                                                                 System.out.println("active flag 2");
                                                             }else{
@@ -419,62 +418,45 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                                 flag2=true;
                                                 System.out.println("Flag 1: " + flag);
                                                 
-                                                if (flag == 1){
-                                                    setFlag(true);
-                                                    System.out.println("entre a flag 1  y no deberia");
-                                                    try {
-                                                        if (combo [j].getSelectedItem() == "Días" || combo [j].getSelectedItem() == "Meses"){
-                                                        System.out.println(j);
-                                                            System.out.println("hablame");
-                                                        BD.st.execute("INSERT INTO tipo_servicio_has_automovil"
-                                                                + "  (Tipo_Servicio_idTipo_Servicio,Automovil_Placa, Automovil_Model, Tiempo)"
-                                                                + " VALUES ("+id[j]+",'"+Placa+"','"+Modelo+"' ,'"+ tiempo +"');");
                                                 
-                                                        }else{
-                                                            BD.st.execute("INSERT INTO tipo_servicio_has_automovil"
-                                                                + "  (Tipo_Servicio_idTipo_Servicio,Automovil_Placa, Automovil_Model, Km)"
-                                                                + " VALUES ("+id[j]+",'"+Placa+"','"+Modelo+"' ,'"+ (int) spin[j].getValue()+"');");
-                                                           
-                                                        }
-                                                    } catch (SQLException ex) {
-                                                        Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
-                                                    }
-                                                }else{
-                                                    if (flag ==2){
-                                                        try {
-                                                            BD.st.execute("UPDATE tipo_servicio_has_automovil"
-                                                                    + " SET Km = '" + (int) spin[j].getValue() + "', Tiempo = NULL "
-                                                                    + " WHERE Automovil_Placa = '"+ Placa +"' AND Automovil_Model = '"+ Modelo +"' AND Tipo_Servicio_idTipo_Servicio = '" +id [j] +"'; ");
-                                                         
-                                                        } catch (SQLException ex) {
-                                                            Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
-                                                        }
+                                                switch (flag){
+                                                    
+                                                    case 1:
                                                         
-                                                    }else{
-                                                        
-                                                        if (flag == 3){
-                                                            
-                                                                  try {
-                                                            BD.st.execute("UPDATE tipo_servicio_has_automovil"
-                                                                    + " SET Tiempo = '" + tiempo + "' , Km = NULL"
-                                                                    + " WHERE Automovil_Placa = '"+ Placa +"' AND Automovil_Model = '"+ Modelo +"' AND Tipo_Servicio_idTipo_Servicio = '" +id [j] +"'; ");
-                                                            BD.st.close();
-                                                        } catch (SQLException ex) {
-                                                            Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
-                                                        }
-                                                        }
+                                                            setFlag(true);
+                                                            if (componentes [j].unidades.getSelectedItem() == "Días" || componentes [j].unidades.getSelectedItem() == "Meses"){
                                                                 
-                                                    }
-                                                    
-                                                    
-                                                    }
-                                                
+                                                                lista_camiones.add(1);
+                                                                lista_camiones.add(id[j]);
+                                                                lista_camiones.add(tiempo);
+
+                                                            }else{
+                                                                lista_camiones.add(2);
+                                                                lista_camiones.add(id[j]);
+                                                                lista_camiones.add((int) componentes [j].cantidad.getValue());
+                                                            }
+                                                            
+                                                            break;
+                                                    case 2:
+                                                        
+                                                        lista_camiones.add(3);
+                                                        lista_camiones.add(id[j]);
+                                                        lista_camiones.add((int) componentes [j].cantidad.getValue());
+                                                        break;
+                                                        
+                                                    case 3:
+                                                        
+                                                        lista_camiones.add(4);
+                                                        lista_camiones.add(id[j]);
+                                                        lista_camiones.add(tiempo);
+                                                        break;
+                                                }
                                                 
                                             }else {
                                         
                                                 try {
                                                     BD.st.execute(" DELETE FROM servi_cam.tipo_servicio_has_automovil"
-                                                            + " WHERE Tipo_Servicio_idTipo_Servicio ='"+id[j]+ "' and Automovil_Placa = '"+ Placa +"' AND Automovil_Model = '"+ Modelo +"';");
+                                                            + " WHERE Tipo_Servicio_idTipo_Servicio ='"+id[j]+ "' and Automovil_Placa = '"+ Placa +"';");
                                                   
                                                 } catch (SQLException ex) {
                                                     Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
@@ -482,22 +464,22 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                             }
                                     }
 
-                            if (flag2)
-                            dispose();
-                            else {
+                            if (flag2){  
+                                dispose();
+                            }else {
                                 JOptionPane.showMessageDialog(null, "Debe seleccionar al menos 1 tipo de servicio. " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
                             }
                         }
                     });
                             
             
-      
-            }
+        return lista_camiones;
+    }
      
-    public void AgregarServicioCamionNuevo (final String Placa, final String Modelo ,  final int Km, final Date fecha ) throws SQLException{
+    public ArrayList AgregarServicioCamionNuevo (final String Placa,  ArrayList lista ) throws SQLException{
         
         int cont =0;
-        
+        lista_camiones = lista;
        
             ResultSet rs = null;
             
@@ -542,7 +524,15 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                 y+=30;
                             }
                             
-                              
+                            for (int i = 0 ; i+2== lista_camiones.size(); i+=2 ){
+                                
+                                for (int j = 0; cont > j  ;j++){
+                                    
+                                    if ((int)lista_camiones.get(i+1)== id [j]){
+                                            checkBox [j].setSelected(true);
+                                    }
+                                }
+                            }
                     
                             btn.setBounds(150, y+20, 100, 30);
                             this.add(btn);
@@ -570,129 +560,47 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                         
                                     
                                             
-                                            if(flag == 1){
-                                            
-                                                System.out.println("Flag 1: " + flag);
-                                                flag2=true;
-                                                if (flag == 1){
-                                                    
-                                                    try {
-                                                        if (combo [j].getSelectedItem() == "Días" || combo [j].getSelectedItem() == "Meses"){
-                                                        BD.st.execute("INSERT INTO tipo_servicio_has_automovil"
-                                                                + "  (Tipo_Servicio_idTipo_Servicio,Automovil_Placa, Automovil_Model, Tiempo)"
-                                                                + " VALUES ("+id[j]+",'"+Placa+"','"+Modelo+"' ,'"+ tiempo +"');");
-                                                               
-                                                        }else{
-                                                            BD.st.execute("INSERT INTO tipo_servicio_has_automovil"
-                                                                + "  (Tipo_Servicio_idTipo_Servicio,Automovil_Placa, Automovil_Model, Km)"
-                                                                + " VALUES ("+id[j]+",'"+Placa+"','"+Modelo+"' ,'"+ (int) spin[j].getValue()+"');");
-                                                                
-                                                        }
-                                                    } catch (SQLException ex) {
-                                                        Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
-                                                    }
-                                                }
+                    if(flag == 1){
+
+                        System.out.println("Flag 1: " + flag);
+                        flag2=true;
+                        if (flag == 1){
+
+                                if (combo [j].getSelectedItem() == "Días" || combo [j].getSelectedItem() == "Meses"){
+                              /*  BD.st.execute("INSERT INTO tipo_servicio_has_automovil"
+                                        + "  (Tipo_Servicio_idTipo_Servicio,Automovil_Placa, Automovil_Model, Tiempo)"
+                                        + " VALUES ("+id[j]+",'"+Placa+"','"+Modelo+"' ,'"+ tiempo +"');"); */
+                                    lista_camiones.add(1);
+                                    lista_camiones.add(id[j]);
+                                    lista_camiones.add(tiempo);
+                                }else{
+                                   /* BD.st.execute("INSERT INTO tipo_servicio_has_automovil"
+                                        + "  (Tipo_Servicio_idTipo_Servicio,Automovil_Placa, Automovil_Model, Km)"
+                                        + " VALUES ("+id[j]+",'"+Placa+"','"+Modelo+"' ,'"+ (int) spin[j].getValue()+"');"); */
+                                    lista_camiones.add(1);
+                                    lista_camiones.add(id[j]);
+                                    lista_camiones.add(tiempo);
+                                }
+                        }
                                                    
                                                 
+                                
                                                 
-                                            }
-                                    }
-
-                                    
-                                    
-                            if (flag2){        
-                                ResultSet rs = null;
-                                int cont = 0;
-
-                                SimpleDateFormat formato = new SimpleDateFormat("YYYY/MM/dd");
-                                System.out.println(Placa);
-                                System.out.println(Modelo);
-                                try {
-                                    rs = BD.st.executeQuery("SELECT Tipo_Servicio_idTipo_Servicio " +
-                                                          " FROM Tipo_Servicio_has_automovil AS ta " +
-                                                          " WHERE ta.Automovil_Placa = '"+Placa+"' AND ta.Automovil_Model = '"+Modelo+"'  ;" );
-                                     rs.beforeFirst();
-                                      for (;rs.next();cont++);
-
-
-                                } catch (SQLException ex) {
-                                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-
-                                    Object id2 [] = new Object[cont];
-                                    System.out.println("Esto es cont : " + cont);
-                                try {
-                                     rs = BD.st.executeQuery("SELECT Tipo_Servicio_idTipo_Servicio " +
-                                                          " FROM Tipo_Servicio_has_automovil AS ta " +
-                                                          " WHERE ta.Automovil_Placa = '"+Placa+"' AND ta.Automovil_Model = '"+Modelo+"'  ;" );
-                                    rs.beforeFirst();
-
-                                       for(int i = 0; rs.next();i++)
-                                       id2[i] = rs.getInt("Tipo_Servicio_idTipo_Servicio");
-
-                                       for (int i = 0; i<cont ; i++)
-                                      BD.st.execute("INSERT INTO Servicios (Fecha,Costo,Km, Detalle) VALUES ('"+formato.format(fecha)+"', 0 ,'"+ Km +"' , ' ') ;");
-
-                                } catch (SQLException ex) {
-                                    Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-
-
-
-                                    int i = 0;
-                                    try {
-                                        rs = BD.st.executeQuery("SELECT idServicios FROM servicios "
-                                                + " WHERE fecha = '"+formato.format(fecha)+"' AND costo = 0 AND Km = '"+Km+"' ;");
-                                        rs.beforeFirst();
-                                        while (rs.next())
-                                        i++;
-                                    } catch (SQLException ex) {
-                                       
-                                    }
-
-
-                                 Object [] data = new Object[i];
-
-
-                                try {
-                                      rs = BD.st.executeQuery("SELECT idServicios FROM servicios "
-                                                + " WHERE fecha = '"+formato.format(fecha)+"' AND costo = 0 AND Km = '"+Km+"' ;");
-                                    for (i=0 ; rs.next(); i++)
-                                        data [i] = rs.getInt("idServicios");
-                                } catch (SQLException ex) {
-                                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-
-                                int aux = i;
-
-                                try {
-                                    for ( i=0 ; i < aux; i++){
-                                        System.out.println("data : " + data [i]);
-                                        System.out.println("id 2 : " + id2 [i]);
-                                        BD.st.execute("INSERT INTO servicios_has_automovil "
-                                                + "VALUES ('"+data [i] +"','"+Placa+"','" +Modelo+"')");
-                                        BD.st.execute("INSERT INTO servicios_has_tipo_servicio "
-                                                + "VALUES ('"+data [i] +"','"+id2 [i]+"')");
-                                    }
-                                } catch (SQLException ex) {
-                                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-
-
-
-                            
+                            if(flag2==true)
                                 dispose();
-                            }else {
+                            else 
                                 JOptionPane.showMessageDialog(null, "Debe seleccionar al menos 1 tipo de servicio. " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
-                            }
-
+                            
                         }
+                                    }
+                        }
+                        
                         
                         
                     });
                             
                             
-       
+       return lista_camiones;
                             
     }
     
@@ -911,14 +819,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                                                 }
                                                          }else{
                                                              flag = 1;
-                                                         }
-                                                        
-                                                    
-                                                
-                                            
-                                            
-                                        
-                                        
+                                                         }   
                                         }else {
                                             
                                               if ((int) servicios2 [1] [j] <= (int) servicios [aux-1]){
@@ -960,8 +861,6 @@ public class Serviciosasociados extends javax.swing.JFrame {
     
     
 }
-    
-    
 
     /**
      * This method is called from within the constructor to initialize the form.

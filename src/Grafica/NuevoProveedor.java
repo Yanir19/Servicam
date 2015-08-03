@@ -18,7 +18,7 @@ import javax.swing.UnsupportedLookAndFeelException;
  *
  * @author Yanir
  */
-public class NuevoPro extends javax.swing.JFrame {
+public class NuevoProveedor extends javax.swing.JFrame {
 
     /**
      * Creates new form NuevoCam
@@ -28,7 +28,7 @@ public class NuevoPro extends javax.swing.JFrame {
    
     
     
-    public NuevoPro() throws SQLException {
+    public NuevoProveedor() throws SQLException {
         initComponents();
         this.setTitle("Crear un nuevo proveedor.");
         BD = new manejador_bd();
@@ -312,7 +312,7 @@ public class NuevoPro extends javax.swing.JFrame {
                              serv.AgregarServicioProveedor( RifText.getText(), RazonsText.getText());
                              serv.setVisible(true);
                          } catch (SQLException ex) {
-                             Logger.getLogger(NuevoPro.class.getName()).log(Level.SEVERE, null, ex);
+                             Logger.getLogger(NuevoProveedor.class.getName()).log(Level.SEVERE, null, ex);
                          }
                        
                        
@@ -362,14 +362,15 @@ public class NuevoPro extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(NuevoPro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(NuevoProveedor.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(NuevoPro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(NuevoProveedor.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(NuevoPro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(NuevoProveedor.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(NuevoPro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(NuevoProveedor.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
@@ -387,9 +388,9 @@ public class NuevoPro extends javax.swing.JFrame {
                     Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 try {
-                    new NuevoPro().setVisible(true);
+                    new NuevoProveedor().setVisible(true);
                 } catch (SQLException ex) {
-                    Logger.getLogger(NuevoPro.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(NuevoProveedor.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });

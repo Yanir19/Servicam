@@ -1,3 +1,4 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -347,7 +348,7 @@ public class Proveedores extends javax.swing.JFrame {
                try {
                    
                    Serviciosasociados serv = new Serviciosasociados();
-                   serv.EditarServicioProveedor(info[1].getText(),info[1].getText());
+                   serv.EditarServicioProveedor(info[0].getText(),info[1].getText());
                    serv.setVisible(true);
                } catch (SQLException ex) {
                    Logger.getLogger(Proveedores.class.getName()).log(Level.SEVERE, null, ex);
