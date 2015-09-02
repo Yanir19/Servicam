@@ -20,6 +20,7 @@ import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.UnsupportedLookAndFeelException;
 
 /**
@@ -238,7 +239,7 @@ public class Proveedores extends javax.swing.JFrame {
                 proveedor [3] = rs.getString("tlf2");
                 proveedor [4] = rs.getString("fax");
                 proveedor [5] = rs.getString("Contacto");
-                proveedor [6] = rs.getString("Direcion");
+                proveedor [6] = rs.getString("Direccion");
 
             }
         } catch (SQLException ex) {
@@ -285,8 +286,8 @@ public class Proveedores extends javax.swing.JFrame {
     private void EditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditarActionPerformed
        
        
-       final Button btn = new  Button ("Aceptar");
-       final Button btn2 = new Button ("Editar servicios");
+       final JButton btn = new  JButton ("Aceptar");
+       final JButton btn2 = new JButton ("Editar servicios");
        int index = Tlflabel.getText().indexOf(" - ");
    
        info [0] = new TextField(Razonslabel.getText());      
@@ -297,17 +298,6 @@ public class Proveedores extends javax.swing.JFrame {
        info [5] = new TextField(Personalabel.getText());
        info [6] = new TextField(Direccionlabel.getText());
        
-      /* 
-       this.getContentPane().remove(Razonslabel);
-       this.getContentPane().remove(Riflabel);
-       this.getContentPane().remove(Tlflabel);
-       this.getContentPane().remove(Faxlabel);
-       this.getContentPane().remove(Personalabel);
-       this.getContentPane().remove(Direccionlabel);
-       this.getContentPane().remove(Editar);
-       this.getContentPane().remove(ServicioList);
-       this.repaint();
-       */
        
        Razonslabel.setVisible(false);
        Riflabel.setVisible(false);
@@ -363,8 +353,8 @@ public class Proveedores extends javax.swing.JFrame {
            public void actionPerformed(ActionEvent e) {
                
             try {
-                BD.st.execute("UPDATE proveedor "
-                        + " SET Rif = '"+info [1].getText()+"', RazonSocial = '"+info [0].getText()+ "', Direcion = '"+info [6].getText()+"', Fax = "+info [4].getText()+" , Tlf1 = '"+info [2].getText()+"' , Tlf2 = "+info [3].getText()+" , Contacto = '"+info [5].getText()+"' "
+                BD.st.execute("UPDATE Proveedor "
+                        + " SET Rif = '"+info [1].getText()+"', RazonSocial = '"+info [0].getText()+ "', Direccion = '"+info [6].getText()+"', Fax = '"+info [4].getText()+"' , Tlf1 = '"+info [2].getText()+"' , Tlf2 = '"+info [3].getText()+"' , Contacto = '"+info [5].getText()+"' "
                         + "  WHERE Rif = '"+info [1].getText()+"' ;");
             } catch (SQLException ex) {
                 Logger.getLogger(Proveedores.class.getName()).log(Level.SEVERE, null, ex);

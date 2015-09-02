@@ -38,7 +38,6 @@ public class NuevoCam extends javax.swing.JFrame {
         serv = new Serviciosasociados();
         BD = new manejador_bd();
         getContentPane().remove(atrasbtn);
-        getContentPane().remove(aceptarbtn);
     }
 
     
@@ -65,7 +64,6 @@ public class NuevoCam extends javax.swing.JFrame {
         Editarbtn = new javax.swing.JButton();
         Asociarbtn = new javax.swing.JButton();
         atrasbtn = new javax.swing.JButton();
-        aceptarbtn = new javax.swing.JButton();
 
         jTextField1.setText("jTextField1");
 
@@ -127,8 +125,6 @@ public class NuevoCam extends javax.swing.JFrame {
 
         atrasbtn.setText("Atras");
 
-        aceptarbtn.setText("Aceptar");
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -163,14 +159,9 @@ public class NuevoCam extends javax.swing.JFrame {
                                 .addGap(10, 10, 10)
                                 .addComponent(atrasbtn)))
                         .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(aceptarbtn)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(Editarbtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGap(18, 18, 18)
-                                .addComponent(salirbtn)))))
+                        .addComponent(Editarbtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(salirbtn)))
                 .addGap(28, 28, 28))
         );
         layout.setVerticalGroup(
@@ -206,9 +197,7 @@ public class NuevoCam extends javax.swing.JFrame {
                     .addComponent(salirbtn)
                     .addComponent(Editarbtn))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(atrasbtn)
-                    .addComponent(aceptarbtn))
+                .addComponent(atrasbtn)
                 .addContainerGap(20, Short.MAX_VALUE))
         );
 
@@ -318,18 +307,15 @@ public class NuevoCam extends javax.swing.JFrame {
                         
                         try {
                             Asociar_camion_con_servicios();
-                        } catch (SQLException ex) {
-                            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                        
-                        
-                        try {
                             BD.st.execute("UPDATE automovil"
                                     + " SET Placa = '" + Placatext.getText() + "' , Model = '" + Modelotext.getText() + "' , "
                                     + "Chofer = '" + Chofertext.getText() + "' , Km = " + Kilometrajespin.getValue()
                                     + " WHERE Placa = '"+ Pl +"' AND Model = '"+ Modelotext.getText() + "' ; ");
+                            JOptionPane.showMessageDialog(null, "Los datos del camion fueron actualizados con éxito." ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
                         } catch (SQLException ex) {
-                            Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
+                              JOptionPane.showMessageDialog(null, "Codigo de error : " + ex.getErrorCode()  + " \n " + ex  + "\n" + 
+                                      "Clase: NuevoCam " + "\n" +  "Método: AceptaractionPerformed ()" ,"Error.", JOptionPane.ERROR_MESSAGE);   
+        
                         }
                         
                         
@@ -445,7 +431,7 @@ public class NuevoCam extends javax.swing.JFrame {
      System.out.println("tamano de lista : " + lista_servicios_asociados.size());
     for (int i = 0; i+2 <=  lista_servicios_asociados.size(); i+=3 ){
             
-        System.out.println("Contenido de lista : " + lista_servicios_asociados.get(i) + "posicion : " + i );
+        System.out.println("Contenido de lista : " + lista_servicios_asociados.get(i) + " posicion : " + i );
         
         switch ((int)lista_servicios_asociados.get(i)) {
 
@@ -466,7 +452,7 @@ public class NuevoCam extends javax.swing.JFrame {
                 System.out.println("Modelo : " + Modelotext.getText());
                 BD.st.execute("INSERT INTO tipo_servicio_has_automovil"
                                 + "  (Tipo_Servicio_idTipo_Servicio,Automovil_Placa, Automovil_Model, Km)"
-                                + " VALUES ("+lista_servicios_asociados.get(i+1)+",'"+Placatext.getText()+"','"+Modelotext.getText()+"' ,'"+ lista_servicios_asociados.get(i+2) +" km');");
+                                + " VALUES ("+lista_servicios_asociados.get(i+1)+",'"+Placatext.getText()+"','"+Modelotext.getText()+"' ,"+ lista_servicios_asociados.get(i+2) +");");
                 break;
 
             case 3:
@@ -564,7 +550,6 @@ public class NuevoCam extends javax.swing.JFrame {
     private javax.swing.JTextField Modelotext;
     private javax.swing.JLabel Placa;
     private javax.swing.JTextField Placatext;
-    private javax.swing.JButton aceptarbtn;
     private javax.swing.JButton atrasbtn;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

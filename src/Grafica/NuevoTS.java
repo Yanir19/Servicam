@@ -6,6 +6,7 @@
 
 package Grafica;
 
+import Objetos.Errores_Mysql;
 import Objetos.manejador_bd;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,8 +46,9 @@ public class NuevoTS extends javax.swing.JFrame {
 
         jLabel1 = new javax.swing.JLabel();
         ServicioTEXT = new javax.swing.JTextField();
-        button1 = new java.awt.Button();
-        Eliminarbtn = new java.awt.Button();
+        AgregarBtn = new javax.swing.JButton();
+        EliminarBtn = new javax.swing.JButton();
+        SalirBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -58,17 +60,24 @@ public class NuevoTS extends javax.swing.JFrame {
             }
         });
 
-        button1.setLabel("Agregar");
-        button1.addActionListener(new java.awt.event.ActionListener() {
+        AgregarBtn.setText("Agrega");
+        AgregarBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                button1ActionPerformed(evt);
+                AgregarBtnActionPerformed(evt);
             }
         });
 
-        Eliminarbtn.setLabel("Eliminar");
-        Eliminarbtn.addActionListener(new java.awt.event.ActionListener() {
+        EliminarBtn.setText("Eliminar");
+        EliminarBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                EliminarbtnActionPerformed(evt);
+                EliminarBtnActionPerformed(evt);
+            }
+        });
+
+        SalirBtn.setText("Salir");
+        SalirBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SalirBtnActionPerformed(evt);
             }
         });
 
@@ -77,18 +86,18 @@ public class NuevoTS extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(40, 40, 40)
+                .addComponent(jLabel1)
+                .addGap(44, 44, 44)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(40, 40, 40)
-                        .addComponent(jLabel1)
-                        .addGap(44, 44, 44)
-                        .addComponent(ServicioTEXT, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(92, 92, 92)
-                        .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(52, 52, 52)
-                        .addComponent(Eliminarbtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(56, Short.MAX_VALUE))
+                        .addComponent(AgregarBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(EliminarBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(SalirBtn))
+                    .addComponent(ServicioTEXT))
+                .addContainerGap(30, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -98,10 +107,11 @@ public class NuevoTS extends javax.swing.JFrame {
                     .addComponent(jLabel1)
                     .addComponent(ServicioTEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(Eliminarbtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(24, 24, 24))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(EliminarBtn)
+                    .addComponent(AgregarBtn)
+                    .addComponent(SalirBtn))
+                .addGap(25, 25, 25))
         );
 
         pack();
@@ -111,71 +121,37 @@ public class NuevoTS extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_ServicioTEXTActionPerformed
 
-    private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
-
+    private void AgregarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AgregarBtnActionPerformed
         ResultSet rs = null;
         boolean flag = true;
         
         try {
-            rs = BD.st.executeQuery("SELECT distinct  Descripcion from tipo_servicio;");
-            rs.beforeFirst();
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoTS.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        try {
-            while(rs.next()){
-                if (!ServicioTEXT.equals(rs.getString("Discripcion")))
-                    flag = false;
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoTS.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        if(flag){
-            try {
-                BD.st.execute( "INSERT INTO  Tipo_Servicio (Descripcion) VALUES ('"+ ServicioTEXT.getText()+ "');" );
-            } catch (SQLException ex) {
-                Logger.getLogger(NuevoTS.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }else{
-            JOptionPane.showMessageDialog(null, "Este servicio ya existe" ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
-        }
-            dispose();
-    }//GEN-LAST:event_button1ActionPerformed
-
-    private void EliminarbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EliminarbtnActionPerformed
-        
-        ResultSet rs = null;
-            
-        try {
-            rs=BD.st.executeQuery("SELECT Descripcion FROM tipo_servicio ;");
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoTS.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            rs.beforeFirst();
-        } catch (SQLException ex) {
-            Logger.getLogger(NuevoTS.class.getName()).log(Level.SEVERE, null, ex);
+            BD.st.execute( "INSERT INTO  Tipo_Servicio (Descripcion) VALUES ('"+ ServicioTEXT.getText()+ "');" );
+            JOptionPane.showMessageDialog(null, "El servicio fue creado con exito." ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
+            ServicioTEXT.setText("");
+        } catch (SQLException ex) {          
+            Errores_Mysql manejador_errores = new Errores_Mysql();
+            manejador_errores.Manejador_codigo_error(ex);
         }
 
+    }//GEN-LAST:event_AgregarBtnActionPerformed
+
+    private void EliminarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EliminarBtnActionPerformed
+       
         try {
-            while (rs.next())
-            {
-                if (ServicioTEXT.getText().equals(rs.getString("Descripcion"))){
-                    System.out.println(rs.getString("Descripcion"));
-                    System.out.println(ServicioTEXT.getText());
-                    BD.st.execute(" DELETE FROM tipo_servicio  "
-                               + " WHERE Descripcion='"+ServicioTEXT.getText()+ "' ;");
-                    
-                }
-            }
+            BD.st.execute(" DELETE FROM tipo_servicio  "
+                       + " WHERE Descripcion='"+ServicioTEXT.getText()+ "' ;");
+            JOptionPane.showMessageDialog(null, "El servicio fue eliminado con exito." ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
+            ServicioTEXT.setText("");
         } catch (SQLException ex) {
-            Logger.getLogger(NuevoTS.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "Codigo de error : " + ex.getErrorCode()  + " \n " + ex + "\n" +  "Clase: NuevoTS " + "\n" +  "Método: EliminarBtn ()" ,"Error.", JOptionPane.ERROR_MESSAGE);   
         }
         
-        dispose ();
-        
-    }//GEN-LAST:event_EliminarbtnActionPerformed
+    }//GEN-LAST:event_EliminarBtnActionPerformed
+
+    private void SalirBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SalirBtnActionPerformed
+        dispose();
+    }//GEN-LAST:event_SalirBtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -217,9 +193,10 @@ public class NuevoTS extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private java.awt.Button Eliminarbtn;
+    private javax.swing.JButton AgregarBtn;
+    private javax.swing.JButton EliminarBtn;
+    private javax.swing.JButton SalirBtn;
     private javax.swing.JTextField ServicioTEXT;
-    private java.awt.Button button1;
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 }

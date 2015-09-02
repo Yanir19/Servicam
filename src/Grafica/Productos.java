@@ -86,9 +86,9 @@ public class Productos extends javax.swing.JFrame {
             this.producto = new JLabel [i] ;
             this.contador = new JSpinner [i];
             this.checkBox = new JCheckBox [i] ;
-            producto1 = new Object[i][3];
+            producto1 = new Object[i][2];
             
-              rs=BD.st.executeQuery( " SELECT Distinct Producto , Marca, id, cantidad, duracion " +
+              rs=BD.st.executeQuery( " SELECT Distinct Producto , Marca, cantidad, duracion " +
                                     "FROM tipo_servicio ,inventario_has_tipo_servicio as ta, Inventario " +
                                     "WHERE   tipo_servicio.idTipo_Servicio = "+idTipoServicio+" AND ta.Tipo_Servicio_idTipo_Servicio = tipo_servicio.idTipo_Servicio " +
                                     "AND Producto =  ta.Inventario_Producto and Marca =  ta.Inventario_Marca ;");
@@ -99,9 +99,8 @@ public class Productos extends javax.swing.JFrame {
                for(i = 0 ; rs.next(); i ++)
                 {
                     producto [i] = new JLabel(rs.getString("Producto") + " - " + rs.getString("Marca"));
-                    producto1 [i] [0] = rs.getInt("id");
-                    producto1 [i] [1] = rs.getInt("cantidad");
-                    producto1 [i] [2] = rs.getString("duracion");
+                    producto1 [i] [0] = rs.getInt("cantidad");
+                    producto1 [i] [1] = rs.getString("duracion");
                 }
                
                int y=20;
@@ -185,32 +184,34 @@ System.out.println("entre a Productos.insertar");
     float diferencia = 0 ;
     int posicion=0; 
     int litros = 0;
+    String duracion;
     float cantidad = 0;
 
     for (int k=0; k<f;k++){
         if (checkBox[k].isSelected()== true){
             System.out.println("producto : " + producto [k].getText() );
             posicion = producto [k].getText().indexOf(" - ");
-
-
-            litros =(int) producto1[k][2].toString().indexOf(" ");
+            System.out.println(" producto1[k][1].toString() :" + producto1[k][1].toString());
+            duracion = producto1[k][1].toString();
+            litros = duracion.indexOf("litros");
+            System.out.println("litros : " + litros);
             
               System.out.println("litros : " + litros);  
 
 
                 if(litros>0){
-                    cantidad = Integer.parseInt(producto1[k][2].toString().substring(0 , litros));
+                    cantidad = Integer.parseInt(producto1[k][1].toString().substring(0 , litros));
                     System.out.println("cantidad : " +cantidad);
                     System.out.println(" contador : " + (int)contador [k].getValue());
                     diferencia = ( (int) contador [k].getValue()/cantidad);
-                      System.out.println("diferencia : " +diferencia);
+                    System.out.println("diferencia : " +diferencia);
                 }else{
                     diferencia = (int) contador [k].getValue();
                 }
 
 
                 try {
-                    System.out.println("yo no debi entrar aqui");
+                    System.out.println("diferencia :" + diferencia );
                     BD.st.execute("UPDATE Inventario SET Cantidad = Cantidad - "+ diferencia + " "+
                      " WHERE Producto = '"+producto [k].getText().substring(0,posicion) +"' and Marca =  '"+ producto [k].getText().substring(posicion+3)+"' ;");
                 } catch (SQLException ex) {
@@ -219,7 +220,7 @@ System.out.println("entre a Productos.insertar");
 
                 try {
                      BD.st.execute("INSERT INTO servi_cam.inventario_has_servicios  "
-                        + " VALUES ("+producto1[k][0]+",'"+producto [k].getText().substring(0,posicion)+"','"+ producto [k].getText().substring(posicion+3) +"' "
+                        + " VALUES ('"+producto [k].getText().substring(0,posicion)+"','"+ producto [k].getText().substring(posicion+3) +"' "
                              + ", "+idServicio+", "+ diferencia+" ) ;");
                     } catch (SQLException ex) {
                         Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);

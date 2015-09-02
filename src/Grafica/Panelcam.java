@@ -16,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -47,12 +48,12 @@ import javax.swing.JTextField;;
 public class Panelcam extends JPanel {
 
     private JPanel[] panel = panel = new JPanel[3]; ;
-    private JLabel[] label = new JLabel[12];  
+    private static JLabel[] label = new JLabel[12];  
     private JButton Bserv;
     private Object[][] data2; //Matriz para la tabla de estado de servicio
     private int cont = 0;
     private boolean invent_cont[]; 
-    int KmActual;
+    private int KmActual;
     private ArrayList lista = new ArrayList(); //Lista de los productos utilizados en un cierto servicio
     private ResultSet rs = null; 
     private JButton atc_km [] = new JButton[2]; //Botones para editar el km actual de los camiones
@@ -116,7 +117,8 @@ public class Panelcam extends JPanel {
         
         label[7] = new JLabel();
         KmActual = (int) camion[fila][3];
-        label[7].setText(camion[fila][3].toString() + " Km.");
+        
+        label[7].setText((int) camion[fila][3] + " Km.");
         label[7].setLayout(null);
         label[7].setBounds( 150, 110 , 100, 20);
         
@@ -413,7 +415,7 @@ public class Panelcam extends JPanel {
                                   try {
 
 
-                                      actulizar_km (Proveedor [4]);
+                                      actualizar_km (Proveedor [4]);
 
                                       BD.st.execute("INSERT INTO Servicios (Fecha,Costo,Km,Detalle) VALUES ('"+Proveedor[1]+"','"
                                               +Proveedor[2]+"','"+Proveedor[4]+"','"
@@ -593,32 +595,47 @@ public class Panelcam extends JPanel {
                              "SET Km = "+Km_TF.getText()+" " +
                              "WHERE Placa = '"+label[3].getText()+"'  and Model = '"+label[1].getText()+"' ;");
                 
-        label [7].setText(Km_TF.getText() + " Km.");
-        //this.remove(Km_TF);
-        //this.remove(atc_km[1]);
+        label [7].setText(Km_TF.getText() + " Km");
         Km_TF.setVisible(false);
         atc_km[1].setVisible(false);
         label [7].setVisible(true);
         atc_km[0].setVisible(true);
-        
+        actualizar_km (Integer.parseInt(Km_TF.getText()));
         tablas ( camion, fila );
-       
+        Km_TF.setText("");
     }
    
-    public void actulizar_km ( Object Proveedor ) throws SQLException{
-        String palabra =  label[7].getText().substring(0, label[7].getText().indexOf(" "));
-        if(Integer.parseInt(palabra) < Integer.parseInt((String) Proveedor)){
+    public void actualizar_km ( int Km ) throws SQLException{
+      
+   //     try{
+        
+        
+            System.out.println("Actulizar Km : " + Km);
+            String palabra =  label[7].getText().substring(0, label[7].getText().indexOf(" "));
+            System.out.println("palabra : " + palabra);
             
-            this.BD.st.execute(" UPDATE automovil " +
-                             "SET Km = "+Proveedor+" " +
-                             " WHERE Placa = '"+label[3].getText()+"'  and Model = '"+label[1].getText()+"' ;");
-        }
+            if(Integer.parseInt(palabra) <=  Km){
+                
+                this.BD.st.execute(" UPDATE automovil " +
+                                 "SET Km = "+Km+" " +
+                                 " WHERE Placa = '"+label[3].getText()+"'  and Model = '"+label[1].getText()+"' ;");
+                label[7].setText(Km + " Km.");
+            }else{
+                JOptionPane.showMessageDialog(null, "No puede introducir un kilometraje menor que el actual" ,"Error.", JOptionPane.WARNING_MESSAGE);   
+            }
+    /*   }catch (Exception ex) {
+                  JOptionPane.showMessageDialog(null, ex + "\n"  + "Clase: Panelcam " + "\n" +  "Método: actualizar_km ()" ,"Error.", JOptionPane.ERROR_MESSAGE);   
+      
+        } */
+        
+        
+        
+        
     }
     
     private void tablas ( final Object [][] camion, final int fila) throws SQLException{
         
                 
-      //          SimpleDateFormat sdf=new SimpleDateFormat("dd/MM/yyyy"); 
                 
              panel[1].removeAll();
              panel[2].removeAll();
@@ -666,24 +683,25 @@ public class Panelcam extends JPanel {
                     
                 rs.beforeFirst();
                 j=0;    
-
-
+                
+                
                 while (rs.next())
                 {
-                 data [j][0]= rs.getInt("ser.idServicios");   
-                 data [j][1]= rs.getInt("KM");
-                 data [j][2]= formato.format(rs.getDate("Fecha"));
-                 data [j][3]= rs.getString("Descripcion");
-                 data [j][4]= rs.getFloat("Costo");
-                 data [j][5]= rs.getString("RazonSocial");
-                 data [j][6]= rs.getString("Detalle");
-
-                  
-                 j++;
+                    data [j][0]= rs.getInt("ser.idServicios");   
+                    data [j][1]= rs.getInt("KM");
+                    data [j][2]= formato.format(rs.getDate("Fecha"));
+                    data [j][3]= rs.getString("Descripcion");
+                    data [j][4]= rs.getFloat("Costo");
+                    data [j][5]= rs.getString("RazonSocial");
+                    data [j][6]= rs.getString("Detalle");
+                    j++;
                 }
-                 
+                
+                if (j>0){
+                   actualizar_km((int) data [0][1]);
+                }
              
-
+                
                    
                 rs = BD.st.executeQuery("select count(Tipo_Servicio_idTipo_Servicio) as num " +
                                             "from tipo_servicio_has_automovil " +
@@ -723,7 +741,6 @@ public class Panelcam extends JPanel {
 
                    }catch (SQLException ex) {
                    JOptionPane.showMessageDialog(null, ex.getMessage() ,"Informacion", JOptionPane.WARNING_MESSAGE);
-                   Logger.getLogger(NuevoProducto.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
 
@@ -742,7 +759,6 @@ public class Panelcam extends JPanel {
                     data2 [j][4]= rs.getInt("ts.idTipo_Servicio");
                     data2 [j][5]= rs.getInt("x2.Km");
                     data2 [j][6]= rs.getDate("Fecha");
-                    label[7].setText( data2 [j][5].toString() + " Km.");
                     KmActual = (int) data2 [j][5];
                     j++;
                     
@@ -857,38 +873,12 @@ public class Panelcam extends JPanel {
                     
              } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage() + ex.getSQLState() + ex.getErrorCode() ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
-              Logger.getLogger(NuevoProducto.class.getName()).log(Level.SEVERE, null, ex);
              }
+             repaint();
             
-             
- 
-            
-        
     }
     
     
-    
-    private void conexion () throws SQLException
-    {
-        
-        try {
-           try {
-               Class.forName("com.mysql.jdbc.Driver").newInstance();
-           } catch (InstantiationException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           } catch (IllegalAccessException ex) {
-               Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-           }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-            BD.con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
-            BD.st  = BD.con.createStatement();    
-    
-    
-    }    
-
     
     
     

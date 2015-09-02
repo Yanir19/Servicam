@@ -83,6 +83,8 @@ public class Cam extends javax.swing.JFrame {
         Panelcam[] panel = new Panelcam [aux];
         
         for (i=0; i!=aux;i++){
+          
+          System.out.println("Km en Cam : " + (int) data[i][3] );  
           panel [i] = new Panelcam(data,i);
           panel [i].setSize(new Dimension(300, 300));
           panel [i].setMaximumSize(new Dimension(300, 300));

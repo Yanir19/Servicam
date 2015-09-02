@@ -67,7 +67,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
         
     }
     
-    public ArrayList  AgregarProducto (final int idinv , final String Producto, final String Marca, ArrayList argumento_lista_productos) throws SQLException{
+    public ArrayList  AgregarProducto ( final String Producto, final String Marca, ArrayList argumento_lista_productos) throws SQLException{
         
         
         int cont =0;
@@ -683,7 +683,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
         
     }
     
-    public void EditarServicioProveedor (final String Rif, final String Razon_Social) throws SQLException{
+    public void EditarServicioProveedor ( final String Razon_Social , final String Rif) throws SQLException{
  
         int cont =0;
     
