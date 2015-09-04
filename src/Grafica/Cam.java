@@ -6,7 +6,7 @@
 
 package Grafica;
 
-import Objetos.manejador_bd;
+import Clases.manejador_bd;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.ScrollPane;

@@ -7,7 +7,7 @@
 package Grafica;
 
 
-import Objetos.manejador_bd;
+import Clases.manejador_bd;
 import java.awt.Dimension;
 import java.sql.Connection;
 import java.sql.DriverManager;

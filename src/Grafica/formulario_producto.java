@@ -5,9 +5,12 @@
  */
 package Grafica;
 
+import Clases.manejador_bd;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -16,12 +19,17 @@ import java.util.logging.Logger;
 public class formulario_producto extends javax.swing.JFrame {
 
     private Inventario inventario;
+    private manejador_bd BD;
     /**
      * Creates new form formulario_producto
+     * @param inv
+     * @throws java.sql.SQLException
      */
-    public formulario_producto(Inventario inv) {
+    public formulario_producto(Inventario inv) throws SQLException {
         initComponents();
+        this.setTitle("Producto.");
         inventario = inv;
+        BD = new manejador_bd();
     }
 
     /**
@@ -38,6 +46,7 @@ public class formulario_producto extends javax.swing.JFrame {
         Mostrarbtn = new javax.swing.JButton();
         Productotxf = new javax.swing.JTextField();
         Marcatxf = new javax.swing.JTextField();
+        SalirBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -58,6 +67,13 @@ public class formulario_producto extends javax.swing.JFrame {
             }
         });
 
+        SalirBtn.setText("Salir");
+        SalirBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SalirBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -69,13 +85,14 @@ public class formulario_producto extends javax.swing.JFrame {
                     .addComponent(Marcalbl))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(Productotxf)
-                    .addComponent(Marcatxf, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(106, Short.MAX_VALUE)
-                .addComponent(Mostrarbtn)
-                .addGap(85, 85, 85))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(Mostrarbtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
+                        .addComponent(SalirBtn))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(Productotxf)
+                        .addComponent(Marcatxf, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -88,9 +105,11 @@ public class formulario_producto extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(Marcalbl)
                     .addComponent(Marcatxf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
-                .addComponent(Mostrarbtn)
-                .addGap(19, 19, 19))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Mostrarbtn)
+                    .addComponent(SalirBtn))
+                .addGap(20, 20, 20))
         );
 
         pack();
@@ -98,22 +117,55 @@ public class formulario_producto extends javax.swing.JFrame {
 
     private void MostrarbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MostrarbtnActionPerformed
        
-        
+        ResultSet rs = null ;
         inventario.setProducto(Productotxf.getText());
         inventario.setMarca(Marcatxf.getText());
-        
         try {
-            inventario.historial();
-            inventario.setVisible(true);
-            dispose();
+            rs = BD.st.executeQuery("select count(*) as cantidad from inventario where Producto = '"+Productotxf.getText()+"' and Marca = '"+Marcatxf.getText()+"'  ; ");
+            rs.beforeFirst();
+            rs.next();
+            
+            if (rs.getInt("cantidad")> 0){
+                switch (inventario.tipo_historial){
+                    case 1:
+                        try {
+                            inventario.historial();
+                            inventario.setVisible(true);
+                            dispose();
+                        } catch (SQLException ex) {
+                            Logger.getLogger(formulario_producto.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        break;
+
+                    case 2:
+
+                        try {
+                            inventario.historial_movimientos();
+                            inventario.setVisible(true);
+                            dispose();
+                        } catch (SQLException ex) {
+                            Logger.getLogger(formulario_producto.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        break;
+                }
+            }else{
+                JOptionPane.showMessageDialog(null,"El producto introducido no existe.","Informacion", JOptionPane.WARNING_MESSAGE);
+            }
+            
         } catch (SQLException ex) {
             Logger.getLogger(formulario_producto.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        
     }//GEN-LAST:event_MostrarbtnActionPerformed
 
     private void ProductotxfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProductotxfActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_ProductotxfActionPerformed
+
+    private void SalirBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SalirBtnActionPerformed
+        dispose();
+    }//GEN-LAST:event_SalirBtnActionPerformed
 
        
     
@@ -158,5 +210,6 @@ public class formulario_producto extends javax.swing.JFrame {
     private javax.swing.JButton Mostrarbtn;
     private javax.swing.JLabel Productolbl;
     private javax.swing.JTextField Productotxf;
+    private javax.swing.JButton SalirBtn;
     // End of variables declaration//GEN-END:variables
 }

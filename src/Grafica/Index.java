@@ -6,7 +6,7 @@
 
 package Grafica;
 
-import Objetos.CrearImagen;
+import Clases.CrearImagen;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;

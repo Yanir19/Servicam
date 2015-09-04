@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package Objetos;
+package Clases;
 
 import Grafica.Index;
 import Grafica.NuevoCam;

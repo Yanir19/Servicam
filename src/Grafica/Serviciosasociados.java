@@ -6,8 +6,8 @@
 
 package Grafica;
 
-import Objetos.manejador_bd;
-import Objetos.servicios_camion;
+import Clases.manejador_bd;
+import Clases.servicios_camion;
 import java.awt.BorderLayout;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;

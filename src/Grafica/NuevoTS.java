@@ -6,8 +6,8 @@
 
 package Grafica;
 
-import Objetos.Errores_Mysql;
-import Objetos.manejador_bd;
+import Clases.Errores_Mysql;
+import Clases.manejador_bd;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
