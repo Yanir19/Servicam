@@ -39,7 +39,7 @@ public class Productos extends javax.swing.JFrame {
     private JSpinner contador [];
     private static manejador_bd BD;
     private ResultSet rs = null;
-    private Boolean invent_cont = new Boolean(false);
+    private Boolean invent_cont = false;
     private Object producto1 [] [];
     private int aux;
     private int valor [];
@@ -62,6 +62,7 @@ public class Productos extends javax.swing.JFrame {
         return invent_cont;
     }
     
+    @SuppressWarnings("empty-statement")
     public void SetProducto (int idTipoServicio ) throws SQLException{
         
         Panel pn = new Panel ();
@@ -70,7 +71,7 @@ public class Productos extends javax.swing.JFrame {
      
             System.out.println("idTipoServicio : "  + idTipoServicio);
             
-               rs=BD.st.executeQuery( " SELECT Distinct Producto , Marca  " +
+               rs=manejador_bd.st.executeQuery( " SELECT Distinct Producto , Marca  " +
                                     "FROM tipo_servicio ,inventario_has_tipo_servicio as ta, Inventario " +
                                     "WHERE   tipo_servicio.idTipo_Servicio = "+idTipoServicio+" AND ta.Tipo_Servicio_idTipo_Servicio = tipo_servicio.idTipo_Servicio " +
                                     "AND Producto=  ta.Inventario_Producto and Marca =  ta.Inventario_Marca ;");
@@ -88,7 +89,7 @@ public class Productos extends javax.swing.JFrame {
             this.checkBox = new JCheckBox [i] ;
             producto1 = new Object[i][2];
             
-              rs=BD.st.executeQuery( " SELECT Distinct Producto , Marca, cantidad, duracion " +
+              rs=manejador_bd.st.executeQuery( " SELECT Distinct Producto , Marca, cantidad, duracion " +
                                     "FROM tipo_servicio ,inventario_has_tipo_servicio as ta, Inventario " +
                                     "WHERE   tipo_servicio.idTipo_Servicio = "+idTipoServicio+" AND ta.Tipo_Servicio_idTipo_Servicio = tipo_servicio.idTipo_Servicio " +
                                     "AND Producto =  ta.Inventario_Producto and Marca =  ta.Inventario_Marca ;");

@@ -12,13 +12,12 @@ import com.toedter.calendar.JDateChooser;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -49,24 +48,24 @@ import javax.swing.JTextField;;
 public class Panelcam extends JPanel {
 
     private JPanel[] panel = panel = new JPanel[3]; ;
-    private JLabel[] label = new JLabel[12];  
-    private JButton Bserv;
+    private final JLabel[] label = new JLabel[12];  
+    private final JButton Bserv;
     private Object[][] data2; //Matriz para la tabla de estado de servicio
     private int cont = 0;
     private boolean invent_cont[]; 
     private int KmActual;
-    private ArrayList lista = new ArrayList(); //Lista de los productos utilizados en un cierto servicio
     private ResultSet rs = null; 
-    private JButton atc_km [] = new JButton[2]; //Botones para editar el km actual de los camiones
-    private JTextField Km_TF; //JTextField que modifica el kilometraje actual de los camiones
+    private final JButton atc_km [] = new JButton[2]; //Botones para editar el km actual de los camiones
+    private final JTextField Km_TF; //JTextField que modifica el kilometraje actual de los camiones
     public  manejador_bd BD;
-    
-    
-    
+    private ArrayList lista; // Lista con todos los productos que seran rebajados de inventario
+    private boolean advertencia_servicio = true;
     
     @SuppressWarnings("empty-statement")
     public Panelcam(final Object [][] camion, final int fila) throws SQLException {
         
+        
+    
     this.setPreferredSize(new Dimension(400,300));
     this.setMinimumSize(new Dimension(800, 600)); 
     this.setLayout(new BorderLayout());                 
@@ -163,6 +162,7 @@ public class Panelcam extends JPanel {
         
         Bserv.addActionListener (new ActionListener()
        {
+         @Override
          public void actionPerformed (ActionEvent e)
          {
              
@@ -172,16 +172,18 @@ public class Panelcam extends JPanel {
             }
             else
             {
+                        advertencia_servicio = true;
                         final Servicio serv; 
                         int i = 0;
                         int j=0;
                         int x=20;
-                        
-                        
+                        ArrayList servicios_asociados = new ArrayList();
+                                
                          try {
 
                             serv = new  Servicio();
                             serv.addWindowListener( new WindowAdapter() { 
+                            @Override
                             public void windowClosing( WindowEvent evt ) { 
                              serv.dispose();
                             } 
@@ -202,7 +204,7 @@ public class Panelcam extends JPanel {
 
                             for (i=0; i!=cont;i++){
 
-                                invent_cont [i] = new Boolean(false);
+                                invent_cont [i] = false;
                                 proveedor [i] = new JComboBox();
                             }
 
@@ -240,9 +242,22 @@ public class Panelcam extends JPanel {
                             label [7] = new JLabel ("Detalle");
                             label [7].setBounds(x+=125, 20, 40, 30);
                             pn.add(label [7]);
-
-
-                            rs = BD.st.executeQuery("select Descripcion, tipo_servicio_has_proveedor.Razon_social, idTipo_Servicio " +
+                            
+                            rs = manejador_bd.st.executeQuery("SELECT idTipo_Servicio , Descripcion " +
+                                                        "FROM  tipo_servicio " +
+                                                        "inner join tipo_servicio_has_automovil " +
+                                                        "on idTipo_Servicio = Tipo_Servicio_idTipo_Servicio " +
+                                                        "where Automovil_Placa = '" + camion [fila] [0] +"' " +
+                                                        "and Automovil_Model = '" +camion [fila] [1]  +"' ;");
+                            
+                            rs.beforeFirst();
+                            while(rs.next()) {
+                                servicios_asociados.add(rs.getString("Descripcion"));
+                                servicios_asociados.add((int)rs.getInt("idTipo_Servicio"));
+                            }
+                            
+                            
+                            rs = manejador_bd.st.executeQuery("select Descripcion, tipo_servicio_has_proveedor.Razon_social, idTipo_Servicio " +
                                                     "from  tipo_servicio_has_proveedor, ( " +
                                                     "select Descripcion, idTipo_Servicio " +
                                                     "from tipo_servicio " +
@@ -252,29 +267,36 @@ public class Panelcam extends JPanel {
                                                     "and Automovil_Model = '"+camion [fila][1] + "' ) as servi " +
                                                     "where Tipo_Servicio_idTipo_Servicio = servi.idTipo_Servicio;");
                             rs.beforeFirst();
-                            final Object tipo_servi [][] = new Object [cont] [2];
+                            final ArrayList tipo_servi = new ArrayList();
                             
-                            i=0;
-                            if (rs.next()){
-                                tipo_servi [i] [0] = rs.getString("Descripcion");
-                                tipo_servi [i] [1] = rs.getInt("idTipo_Servicio");
-                                proveedor[i].addItem(rs.getString("tipo_servicio_has_proveedor.Razon_social"));
-                                i++;
-                            }
-                            
+                            i=-1;
+                            j=0;
+                                
                             while(rs.next())   
                             {
-                                if ( rs.getInt("idTipo_Servicio") != (int) tipo_servi [i-1] [1] ){
-                                    tipo_servi [i] [0] = rs.getString("Descripcion");
-                                    tipo_servi [i] [1] = rs.getInt("idTipo_Servicio");
-                                    proveedor[i].addItem(rs.getString("tipo_servicio_has_proveedor.Razon_social"));
+                                
+                                if (!tipo_servi.contains((int)rs.getInt("idTipo_Servicio"))){
                                     i++;
+                                    tipo_servi.add(rs.getString("Descripcion"));
+                                    tipo_servi.add((int)rs.getInt("idTipo_Servicio"));
+                                    proveedor[i].addItem(rs.getString("tipo_servicio_has_proveedor.Razon_social"));
+                                    j+=2;
                                 }else{
                                     proveedor[i].addItem(rs.getString("tipo_servicio_has_proveedor.Razon_social"));
                                 }
+                                
                             }
                             
-                            
+                            for(j=0;j/2<i;j+=2){
+                                if(!tipo_servi.contains(servicios_asociados.get(j))){
+                                    
+                                    serv.dispose();
+                                    Mensajes_emergentes mensaje = new Mensajes_emergentes();
+                                    mensaje.clear();
+                                    mensaje.add(servicios_asociados.get(j));
+                                    mensaje.Mostrar_mensajes(2);
+                                }
+                            }
 
                            
 
@@ -284,57 +306,60 @@ public class Panelcam extends JPanel {
 
                             x=20;
                             int y=60;
+                            j=0;
+                            
+                            for ( i=0 ; i<cont;i++, j+=2 ){
+                                tipo [i] = new JLabel ( tipo_servi.get(j).toString()); 
+                                tipo [i].setBounds(x,y, 200, 30);
+                                pn.add(tipo [i]);
+                                checkBox[i] = new JCheckBox () ;
+                                checkBox [i].setBounds(x+=230,y+5, 30, 30);
+                                pn.add(checkBox[i]);
+                                proveedor[i].setBounds(x+=130,y, 150, 30);
+                                pn.add(proveedor[i]);
+                                calendario[i] = new JDateChooser ();
+                                calendario [i].setBounds(x+=180,y, 150, 30);
+                                pn.add(calendario [i]);
+                                costo [i] = new JTextField ();
+                                costo [i].setBounds(x+=180,y, 100, 30);
+                                pn.add(costo [i]);
+                                btn [i] = new JButton("Inventario");
+                                btn [i].setBounds(x+=130,y, 100, 30);
+                                pn.add(btn[i]);
+                                km [i] = new JTextField ();
+                                km [i].setBounds(x+=130,y, 100, 30);
+                                pn.add(km [i]);
+                                detalle [i] = new JTextField ();
+                                detalle [i].setBounds(x+=130,y, 300, 30);
+                                pn.add(detalle [i]);
 
-                            for ( i=0 ; i<cont;i++ ){
-                              tipo [i] = new JLabel ( (String) tipo_servi [i] [0]);  
-                              tipo [i].setBounds(x,y, 200, 30);
-                              pn.add(tipo [i]);
-                              checkBox[i] = new JCheckBox () ;
-                              checkBox [i].setBounds(x+=230,y+5, 30, 30);
-                              pn.add(checkBox[i]);
-                              proveedor[i].setBounds(x+=130,y, 150, 30);
-                              pn.add(proveedor[i]);
-                              calendario[i] = new JDateChooser ();
-                              calendario [i].setBounds(x+=180,y, 150, 30);
-                              pn.add(calendario [i]);
-                              costo [i] = new JTextField ();
-                              costo [i].setBounds(x+=180,y, 100, 30);
-                              pn.add(costo [i]);
-                              btn [i] = new JButton("Inventario");
-                              btn [i].setBounds(x+=130,y, 100, 30);
-                              pn.add(btn[i]);
-                              km [i] = new JTextField ();
-                              km [i].setBounds(x+=130,y, 100, 30);
-                              pn.add(km [i]);
-                              detalle [i] = new JTextField ();
-                              detalle [i].setBounds(x+=130,y, 300, 30);
-                              pn.add(detalle [i]);
-
-                              servi [i] = new Productos ();
-                              final int f = i;
+                                servi [i] = new Productos ();
+                              
+                                final int f = i;
+                                final int l = j;
 
 
-                                    /*Accion del boton + para gregar productos del inventario */
-                                    btn [i].addActionListener(new ActionListener() {
+                                /*Accion del boton "Inventario" para gregar productos del inventario */
+                                btn [i].addActionListener(new ActionListener() {
 
-                                   @Override
-                                   public void actionPerformed(ActionEvent e) {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
 
-                                       try {
-                                         servi[f].SetProducto((int) tipo_servi [f] [1]);
-                                       } catch (SQLException ex) {
-                                           Logger.getLogger(Panelcam.class.getName()).log(Level.SEVERE, null, ex);
-                                       }
-                                           servi[f].setVisible(true);
+                                        try {
+                                          servi[f].SetProducto((int) tipo_servi.get(l+1));
+                                        } catch (SQLException ex) {
+                                            Logger.getLogger(Panelcam.class.getName()).log(Level.SEVERE, null, ex);
+                                        }
+                                            servi[f].setVisible(true);
 
-                                   }
+                                    }
 
-                            });
+                                });
 
                                 x=20;
                                 y+=50;
 
-                      }  
+                            }  
 
                             JScrollPane scrollpane = new JScrollPane(pn);
                             scrollpane.setPreferredSize(new Dimension(1600 , y));
@@ -365,13 +390,9 @@ public class Panelcam extends JPanel {
                             int flag = 1;
                             int k = 0;
 
-                            System.out.println("voy a entrar al while");
-                            System.out.println("Tamno de K: " + k);
-                            System.out.println("Tamano de cont: " + cont);
                             
                             try{
                             while(k<cont){
-                                System.out.println("K : " + k);
                                 if (checkBox[k].isSelected()){
                                     if (calendario[k].getDate().before(fecha) && (calendario[k].getDate() != null)  ){
 
@@ -394,27 +415,26 @@ public class Panelcam extends JPanel {
                                 k++;
                             }
                             
-                                System.out.println("Sali del while");
                             }
-                                catch(Exception exc){
+                                catch(NumberFormatException | HeadlessException exc){
                                     JOptionPane.showMessageDialog(null, exc,"Informacion", JOptionPane.WARNING_MESSAGE); 
                                      flag = 0;
                                 } 
 
                             if (flag == 1){
-                            k=0 ;     
-                            for(;k<cont;k++){
+                            k=0 ;   
+                            for(int j = 0;k<cont;k++, j+=2){
                                 if (checkBox[k].isSelected()){
                                     
                                     try{
-                                        Proveedor [0] = tipo_servi [k][0];
+                                        Proveedor [0] = tipo_servi.get(j);
                                         Proveedor [1] = df.format(calendario[k].getDate());
                                         Proveedor [2] = costo[k].getText();
                                         Proveedor [4] = Integer.parseInt(km[k].getText());
                                         Proveedor [5] = detalle[k].getText();
                                         Proveedor [6] = proveedor[k].getSelectedItem();
                                     }catch (Exception ex) {
-                                          JOptionPane.showMessageDialog(null, ex + "\n"  + "Clase: Panelcam " + "\n" +  "Método: serv. boton.addActionListener(new ActionListener() { " ,"Error.", JOptionPane.ERROR_MESSAGE); 
+                                          JOptionPane.showMessageDialog(null, ex + " "  + "Clase: Panelcam " + " " +  "Método: serv. boton.addActionListener(new ActionListener() { " ,"Error.", JOptionPane.ERROR_MESSAGE); 
                                           serv.dispose();
                                     }
 
@@ -422,7 +442,7 @@ public class Panelcam extends JPanel {
 
 
                                         if(KmActual <=  (int) Proveedor [4])
-                                          actualizar_km ( (int) Proveedor [4]);
+                                          actualizar_km ( (int) Proveedor [4], camion, fila);
 
                                         
                                         BD.st.execute("INSERT INTO Servicios (Fecha,Costo,Km,Detalle) VALUES ('"+Proveedor[1]+"','"
@@ -432,11 +452,12 @@ public class Panelcam extends JPanel {
                                           Logger.getLogger(NuevoProveedor.class.getName()).log(Level.SEVERE, null, ex);
                                       }
 
-                                       System.out.println("Ya se inserto el servicio");
+                                    
                                        try {
                                            rs = BD.st.executeQuery("SELECT idServicios FROM servicios WHERE fecha = '"+Proveedor[1]+"' AND costo = '"+Proveedor[2]+"' AND Km = '"+Proveedor[4]+"' ;");
                                        } catch (SQLException ex) {
-
+                                                JOptionPane.showMessageDialog(null, ex + " "  + "Clase: Panelcam " + " " +  "Método: serv. boton.addActionListener(new ActionListener() { " ,"Error.", JOptionPane.ERROR_MESSAGE); 
+                                          
                                        }
 
 
@@ -447,7 +468,7 @@ public class Panelcam extends JPanel {
                                            data [0] = rs.getInt("idServicios");
                                        }
                                    } catch (SQLException ex) {
-
+                                        Logger.getLogger(Panelcam.class.getName()).log(Level.SEVERE, null, ex); 
                                    }
                                    try {
 
@@ -455,25 +476,17 @@ public class Panelcam extends JPanel {
                                        BD.st.execute("INSERT INTO servicios_has_automovil VALUES ('"+data[0]+"','"+camion [fila][0]+"','"
                                        +camion [fila][1]+"')");
                                        } catch (SQLException ex) {
-                                       Logger.getLogger(NuevoProveedor.class.getName()).log(Level.SEVERE, null, ex);
+                                            Logger.getLogger(Panelcam.class.getName()).log(Level.SEVERE, null, ex);
                                        }
 
-                                        System.out.println("Ya se inserto el servicios_has_automovil");
                                         
-
-                                         rs = BD.st.executeQuery(" SELECT idTipo_Servicio "+ 
-                                                              "FROM tipo_servicio_has_automovil, tipo_servicio "+
-                                                              " WHERE  Automovil_Model= '"+ camion [fila][1] +" ' AND  idTipo_Servicio = Tipo_Servicio_idTipo_Servicio AND Descripcion = '"+ tipo_servi [k] [0] +"'");
-
-                                         rs.beforeFirst();
-                                         while (rs.next())
-                                       {
-                                           data [1] = rs.getInt("idTipo_Servicio");
-                                       }
                                          
-                                       BD.st.execute("INSERT INTO servicios_has_tipo_servicio VALUES ('"+data[0]+"','"+data[1]+"') ;");     
+                                        data [1] = tipo_servi.get(j+1);
+                                      
+                                        
+                                         
+                                       BD.st.execute("INSERT INTO servicios_has_tipo_servicio VALUES ("+data[0]+","+data[1]+") ;");     
 
-                                       System.out.println("Ya se inserto el servicios_has_tipo_servicio");
                                        
                                         rs = BD.st.executeQuery("SELECT Rif FROM proveedor WHERE RazonSocial= '"+Proveedor[6]+"' ;" );
 
@@ -485,10 +498,9 @@ public class Panelcam extends JPanel {
 
                                        BD.st.execute("INSERT INTO proveedor_has_servicios VALUES ('" +data[2]+ "','"+data[0]+"') ;");
                                        
-                                       System.out.println("Ya se inserto el proveedor_has_servicios");
                                        
                                    } catch (SQLException ex) {
-
+                                        Logger.getLogger(Panelcam.class.getName()).log(Level.SEVERE, null, ex);
                                    }
 
 
@@ -502,7 +514,8 @@ public class Panelcam extends JPanel {
                                           panel [1].removeAll();
                                           panel [2].removeAll();
                                       try {
-                                          tablas (camion, fila );
+                                          tabla_servicios(camion, fila);
+                                          tabla_proximo_servicio(camion, fila );
                                       } catch (SQLException ex) {
                                           Logger.getLogger(Panelcam.class.getName()).log(Level.SEVERE, null, ex);
                                       }
@@ -551,7 +564,8 @@ public class Panelcam extends JPanel {
         this.add(Km_TF);
         Km_TF.setVisible(false);
         atc_km[1].setVisible(false);
-        tablas ( camion, fila );
+        tabla_servicios(camion, fila);
+        tabla_proximo_servicio(camion, fila );
         
         
         
@@ -586,7 +600,7 @@ public class Panelcam extends JPanel {
     private void add_boton (){
         this.label [7].setVisible(false);
         this.atc_km[0].setVisible(false);
-        
+        this.Km_TF.setText(this.label[7].getText().substring(0, this.label[7].getText().indexOf(" ")));
         this.Km_TF.setVisible(true);
         this.atc_km[1].setVisible(true);
         repaint();
@@ -594,24 +608,18 @@ public class Panelcam extends JPanel {
     
     private void add_boton2 (final Object [][] camion, final int fila) throws SQLException{
         
-        int km_label =  Integer.parseInt(this.label[7].getText().substring(0, this.label[7].getText().indexOf(" ")));
-        int km_tf = Integer.parseInt(Km_TF.getText());
+        this.Km_TF.setVisible(false);
+        this.atc_km[1].setVisible(false);
+        actualizar_km (Integer.parseInt(Km_TF.getText()), camion, fila);
+        advertencia_servicio = true;
+        tabla_proximo_servicio(camion, fila );
+        this.Km_TF.setText("");
+        this.atc_km[0].setVisible(true);
+        repaint();
         
-        if(km_label <=  km_tf){
-            
-            this.Km_TF.setVisible(false);
-            this.atc_km[1].setVisible(false);
-            actualizar_km (Integer.parseInt(Km_TF.getText()));
-            tablas ( camion, fila );
-            this.Km_TF.setText("");
-            this.atc_km[0].setVisible(true);
-            repaint();
-        }else{
-            JOptionPane.showMessageDialog(null,"El kilometraje introducido no puede ser menor que el actual. ","Informacion", JOptionPane.WARNING_MESSAGE);
-        }
     }
    
-    public void actualizar_km ( int Km) throws SQLException{
+    public void actualizar_km ( int Km, final Object [][] camion, final int fila) throws SQLException{
       
 
         this.BD.st.execute(" UPDATE automovil " +
@@ -620,29 +628,19 @@ public class Panelcam extends JPanel {
         
         this.label[7].setText(Km + " Km.");
         this.label[7].setVisible(true);
+        
         KmActual = Km;
                   
     }
     
-    private void tablas ( final Object [][] camion, final int fila) throws SQLException{
+    private void tabla_servicios ( final Object [][] camion, final int fila) throws SQLException{
         
                 
                 
              panel[1].removeAll();
              panel[2].removeAll();
-             boolean est_serv = true;
              Object[][] data;  //Matriz para la tabla general
-             Date Fecha;
              SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");//Formato de fecha
-             Calendar calendar = Calendar.getInstance();//Variable para modificar las fechas (agregar dias o meses)
-             int posicion=0;//Variable auxiliar para determinar si existe la palabra MESES o Dias dentro del tiempo de sriivicio
-             String palabra;//String de la fechas utlizado para calcular los tiempos de cada servicio
-             int  Km=0;
-             int tiempo=0;
-             Calendar fecha_actual= GregorianCalendar.getInstance();
-             fecha_actual.getTime().toLocaleString();
-             ArrayList informacion_camion = new ArrayList();
-             Mensajes_emergentes mensajes = new Mensajes_emergentes();
              
              
              try{
@@ -691,156 +689,16 @@ public class Panelcam extends JPanel {
                     j++;
                 }
                 
-                   
-                rs = BD.st.executeQuery("select count(Tipo_Servicio_idTipo_Servicio) as num " +
-                                            "from tipo_servicio_has_automovil " +
-                                            "where Automovil_Placa = '" + camion [fila] [0] +"' " +
-                                            "and Automovil_Model = '" +camion [fila] [1]  +"' ;");
-              
-                while (rs.next())
-                {
-                 j = rs.getInt("num");
-                }
-                i=j;
-                
-                cont = j;
-                
-                
-                
-                data2 = new Object [j] [7];
 
                     
-                    
-                try{
-                    rs = BD.st.executeQuery ("SELECT distinct  ts.Descripcion, x2.Fecha, ta.Tiempo, ta.Km, x2.Km, ts.idTipo_Servicio " +
-                                            "FROM  tipo_servicio as ts, " +
-                                            "(select * " +
-                                            "from  " +
-                                            "(select *FROM servicios_has_tipo_servicio as st, servicios_has_automovil as sa, servicios " +
-                                            "WHERE sa.Automovil_Placa =  '" + camion [fila] [0] +"' AND sa.Automovil_Model =  '" + camion [fila] [1] +"' AND  st.Servicios_idServicios = sa.idServicios_auto  " +
-                                            "and st.Servicios_idServicios = idServicios " +
-                                            "group by Tipo_Servicio_idTipo_Servicio, Fecha desc, Km) x " +
-                                            "group by Tipo_Servicio_idTipo_Servicio) x2, " +
-                                            "tipo_servicio_has_automovil as ta  " +
-                                            "WHERE   ts.idTipo_Servicio = x2.Tipo_Servicio_idTipo_Servicio " +
-                                            "and ta.Automovil_Placa =   '" + camion [fila] [0] +"' " +
-                                            "and ta.Automovil_Model =   '" + camion [fila] [1] +"'  " +
-                                            "and ta.Tipo_Servicio_idTipo_Servicio = ts.idTipo_Servicio  " +
-                                            "group by  x2.Fecha desc, x2.Km  desc;" );
-
-                   }catch (SQLException ex) {
-                   JOptionPane.showMessageDialog(null, ex.getMessage() ,"Informacion", JOptionPane.WARNING_MESSAGE);
-                }
-                
-
-                rs.beforeFirst();
-                
-                
-                
-                j=0;    
-                
-                while (rs.next())
-                {
-                    data2 [j][0]= rs.getString("ts.Descripcion");
-                    data2 [j][1]= formato.format(rs.getDate("Fecha"));
-                    data2 [j][2]= rs.getString("ta.Tiempo");
-                    data2 [j][3]= rs.getInt("ta.Km");
-                    data2 [j][4]= rs.getInt("ts.idTipo_Servicio");
-                    data2 [j][5]= rs.getInt("x2.Km");
-                    data2 [j][6]= rs.getDate("Fecha");
-                    j++;
-                    
-                }
-                  
-
-                
-
-
-
-                for (j=0; j<i ; j++){
-                    if (data2 [j][2]!= null){
-                       palabra = (String) data2 [j][2]; 
-                       posicion = palabra.indexOf("Meses");
-                       if (posicion != -1){
-                           Fecha = (Date) data2 [j][6];
-                           calendar.setTime(Fecha);
-                           palabra = palabra.replaceAll(" Meses", "");
-                           tiempo = Integer.parseInt(palabra);
-                           calendar.add(Calendar.MONTH, tiempo);
-                           posicion=0;
-                       }else{
-                            palabra = (String) data2 [j][2]; 
-                            posicion = palabra.indexOf("Días");
-                            Fecha = (Date) data2 [j][6];
-                            calendar.setTime(Fecha);
-                            palabra = palabra.replaceAll(" Días", "");
-                            tiempo = Integer.parseInt(palabra);
-                            calendar.add(Calendar.DATE, tiempo);
-
-                            posicion=0;
-                       }
-                       
-                       
-                       if (Integer.parseInt(palabra) > 0){
-                            if (calendar.before(fecha_actual)){ 
-                                data2 [j][2]= "Falta servicio";
-                                est_serv = false;
-                                informacion_camion.add(camion[fila][0]);
-                                informacion_camion.add(camion[fila][1]);
-                                mensajes.setLista(informacion_camion);
-                                mensajes.Mostrar_mensajes(1);
-                                informacion_camion.clear();
-                            }else{
-                                data2 [j][2]= formato.format(calendar.getTime());
-                            }
-                       }else{
-                           data2 [j][2]= "Tiempo indefinido.";
-                       }
-
-                    }else{
-
-                        if(data2 [j][3]!=null){
-                            Km += ((int) data2 [j][3]+ (int) data2 [j][5]) ;
-                             palabra = label[7].getText().substring(0,label[7].getText().indexOf(" Km."));
-                            if (Km >0){
-                                if (Integer.parseInt(palabra = label[7].getText().substring(0,label[7].getText().indexOf(" Km.") ))>=Km ){
-                                    data2 [j][2] = "Falta servicio";
-                                    est_serv = false;
-                                    informacion_camion.add(camion[fila][0]);
-                                    informacion_camion.add(camion[fila][1]);
-                                    mensajes.setLista(informacion_camion);
-                                    mensajes.Mostrar_mensajes(1);
-                                    informacion_camion.clear();
-                                }
-                                else
-                                    data2 [j][2] = Km + " Km";
-                            }else{
-                                data2 [j][2]= "Kilometraje indefinido.";
-                            }
-                        }
-                    }   
-                    Km = 0;
-                }
-
-                    if(!est_serv){                        
-                        label[9].setText("Falta servicio!!!");
-                        label[9].setForeground(Color.red);
-                        informacion_camion.add(camion[fila][0]);
-                        informacion_camion.add(camion[fila][1]);
-                        mensajes.setLista(informacion_camion);
-                        mensajes.Mostrar_mensajes(1);
-                        informacion_camion.clear();
-                    }
-                    else{
-                      label[9].setText(" Ok. "); 
-                      label[9].setForeground(Color.GREEN);
-                    }
+               
                     //array de String's con los títulos de las columnas
                     String[] columnNames = {"idServicio","Km", "Fecha", "Servicio","Costo","Proveedor","Detalles"};       
-                    String[] columnNames2 = {"Servicio","Ultimo","Proximo"};
+                    
 
                     //CREAMOS LAS TABLAS
                     final JTable table = new JTable(data, columnNames){
+                          @Override
                           public boolean isCellEditable (int row, int column)
                             {
                                 return false;
@@ -850,44 +708,213 @@ public class Panelcam extends JPanel {
                     
                     
                     
-                    final JTable table2 = new JTable(data2, columnNames2){
-                          public boolean isCellEditable (int row, int column)
-                            {
-                                return false;
-                            }
-                    }; 
-                    table2.setPreferredScrollableViewportSize(new Dimension(table.getSize()));
                     
                     //Creamos un scrollpanel y se lo agregamos a la tabla 
                     JScrollPane scrollpane = new JScrollPane(table);
-                    JScrollPane scrollpane2 = new JScrollPane(table2);
+                    
                     
                     panel[1].setLayout(new BorderLayout());
                     panel[1].add(scrollpane, BorderLayout.CENTER);
                     panel[1].setBounds (450,20, 1200, 750);
-
-                    panel[2].setLayout(new BorderLayout());
-                    panel[2].add(scrollpane2, BorderLayout.CENTER);
-                    panel[2].setBounds (20,250, 400, 500);
                     this.add( panel[1]);
-                    this.add( panel[2]);
-                    
-                    
                     
              } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage() + ex.getSQLState() + ex.getErrorCode() ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
              }
-             repaint();
             
     }
     
     
     
     
-    
-      
-    
-    
+    private void tabla_proximo_servicio ( final Object [][] camion, final int fila) throws SQLException{
+        
+        panel[2].removeAll();
+        int i = 0;
+        int j = 0;
+        ArrayList informacion_camion = new ArrayList();
+        Mensajes_emergentes mensajes = new Mensajes_emergentes();
+        boolean est_serv = true;
+        Date Fecha;
+        Calendar calendar = Calendar.getInstance();//Variable para modificar las fechas (agregar dias o meses)
+        int posicion=0;//Variable auxiliar para determinar si existe la palabra MESES o Dias dentro del tiempo de sriivicio
+        String palabra;//String de la fechas utlizado para calcular los tiempos de cada servicio
+        int  Km=0;
+        int tiempo=0;
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");//Formato de fecha
+        Calendar fecha_actual= GregorianCalendar.getInstance();
+        fecha_actual.getTime().toLocaleString();
+                   
+        rs = BD.st.executeQuery("select count(Tipo_Servicio_idTipo_Servicio) as num " +
+                                    "from tipo_servicio_has_automovil " +
+                                    "where Automovil_Placa = '" + camion [fila] [0] +"' " +
+                                    "and Automovil_Model = '" +camion [fila] [1]  +"' ;");
+
+        while (rs.next()) {
+            j = rs.getInt("num");
+        }
+        
+        i=j;
+
+        cont = j;
+        
+        data2 = new Object [j] [7];
+        
+        try{
+            rs = BD.st.executeQuery ("SELECT distinct  ts.Descripcion, x2.Fecha, ta.Tiempo, ta.Km, x2.Km, ts.idTipo_Servicio " +
+                                    "FROM  tipo_servicio as ts, " +
+                                    "(select * " +
+                                    "from  " +
+                                    "(select *FROM servicios_has_tipo_servicio as st, servicios_has_automovil as sa, servicios " +
+                                    "WHERE sa.Automovil_Placa =  '" + camion [fila] [0] +"' AND sa.Automovil_Model =  '" + camion [fila] [1] +"' AND  st.Servicios_idServicios = sa.idServicios_auto  " +
+                                    "and st.Servicios_idServicios = idServicios " +
+                                    "group by  Fecha desc, Km desc) x " +
+                                    "group by Tipo_Servicio_idTipo_Servicio desc) x2,  " +
+                                    "tipo_servicio_has_automovil as ta  " +
+                                    "WHERE   ts.idTipo_Servicio = x2.Tipo_Servicio_idTipo_Servicio " +
+                                    "and ta.Automovil_Placa =   '" + camion [fila] [0] +"' " +
+                                    "and ta.Automovil_Model =   '" + camion [fila] [1] +"'  " +
+                                    "and ta.Tipo_Servicio_idTipo_Servicio = ts.idTipo_Servicio  " +
+                                    "group by  x2.Fecha desc, x2.Km  desc;" );
+
+           }catch (SQLException ex) {
+           JOptionPane.showMessageDialog(null, ex.getMessage() ,"Informacion", JOptionPane.WARNING_MESSAGE);
+        }
+                
+
+        rs.beforeFirst();
+
+
+
+        j=0;    
+
+        while (rs.next())
+        {
+            data2 [j][0]= rs.getString("ts.Descripcion");
+            data2 [j][1]= formato.format(rs.getDate("Fecha"));
+            data2 [j][2]= rs.getString("ta.Tiempo");
+            data2 [j][3]= rs.getInt("ta.Km");
+            data2 [j][4]= rs.getInt("ts.idTipo_Servicio");
+            data2 [j][5]= rs.getInt("x2.Km");
+            data2 [j][6]= rs.getDate("Fecha");
+            j++;
+        }
+        
+        for (j=0; j<i ; j++){
+            
+            
+            if (data2 [j][2]!= null){
+               palabra = (String) data2 [j][2]; 
+               posicion = palabra.indexOf("Meses");
+               if (posicion != -1){
+                   Fecha = (Date) data2 [j][6];
+                   calendar.setTime(Fecha);
+                   palabra = palabra.replaceAll(" Meses", "");
+                   tiempo = Integer.parseInt(palabra);
+                   calendar.add(Calendar.MONTH, tiempo);
+                   posicion=0;
+               }else{
+                    palabra = (String) data2 [j][2]; 
+                    posicion = palabra.indexOf("Días");
+                    Fecha = (Date) data2 [j][6];
+                    calendar.setTime(Fecha);
+                    palabra = palabra.replaceAll(" Días", "");
+                    tiempo = Integer.parseInt(palabra);
+                    calendar.add(Calendar.DATE, tiempo);
+
+                    posicion=0;
+               }
+
+
+               if (Integer.parseInt(palabra) > 0){
+                    if (calendar.before(fecha_actual)){ 
+                        data2 [j][2]= "Falta servicio";
+                        est_serv = false;
+
+                        if(advertencia_servicio){
+                            informacion_camion.add(camion[fila][0]);
+                            informacion_camion.add(camion[fila][1]);
+                            mensajes.setLista(informacion_camion);
+                            mensajes.Mostrar_mensajes(1);
+                            informacion_camion.clear();
+                            advertencia_servicio = false;
+                        }
+                    }else{
+                        data2 [j][2]= formato.format(calendar.getTime());
+                    }
+               }else{
+                   data2 [j][2]= "Tiempo indefinido.";
+               }
+
+            }else{
+
+                if(data2 [j][3]!=null){
+                    if ((int) data2 [j][3] >0){
+                        Km += ((int) data2 [j][3]+ (int) data2 [j][5]) ;
+                        palabra = label[7].getText().substring(0,label[7].getText().indexOf(" Km."));
+                        
+                        if (Integer.parseInt(palabra = label[7].getText().substring(0,label[7].getText().indexOf(" Km.") ))>=Km ){
+                            data2 [j][2] = "Falta servicio";
+                            est_serv = false;
+                            if(advertencia_servicio){
+                                informacion_camion.add(camion[fila][0]);
+                                informacion_camion.add(camion[fila][1]);
+                                mensajes.setLista(informacion_camion);
+                                mensajes.Mostrar_mensajes(1);
+                                informacion_camion.clear();
+                                advertencia_servicio = false;
+                            }
+                        }
+                        else
+                            data2 [j][2] = Km + " Km";
+                    }else{
+                        data2 [j][2]= "Kilometraje indefinido.";
+                    }
+                }
+            }   
+            
+            Km = 0;
+        }
+
+        
+        if(!est_serv){                        
+            label[9].setText("Falta servicio!!!");
+            label[9].setForeground(Color.red);
+
+            if(advertencia_servicio){
+                informacion_camion.add(camion[fila][0]);
+                informacion_camion.add(camion[fila][1]);
+                mensajes.setLista(informacion_camion);
+                mensajes.Mostrar_mensajes(1);
+                informacion_camion.clear();
+                advertencia_servicio = false;
+            }
+        }else{
+          label[9].setText(" Ok. "); 
+          label[9].setForeground(Color.GREEN);
+        }
+        
+        
+        String[] columnNames2 = {"Servicio","Ultimo","Proximo"};
+                    
+        final JTable table2 = new JTable(data2, columnNames2){
+              @Override
+              public boolean isCellEditable (int row, int column)
+                {
+                    return false;
+                }
+        }; 
+        
+        table2.setPreferredScrollableViewportSize(new Dimension(table2.getSize()));
+        
+        
+        JScrollPane scrollpane2 = new JScrollPane(table2);
+        panel[2].setLayout(new BorderLayout());
+        panel[2].add(scrollpane2, BorderLayout.CENTER);
+        panel[2].setBounds (20,250, 400, 500);
+        panel[2].repaint();
+        
+    }
     
     
     

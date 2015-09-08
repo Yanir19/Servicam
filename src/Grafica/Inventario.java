@@ -5,6 +5,7 @@
  */
 package Grafica;
 
+import Clases.Mensajes_emergentes;
 import Clases.manejador_bd;
 import java.awt.Dimension;
 import java.sql.ResultSet;
@@ -26,7 +27,7 @@ public class Inventario extends javax.swing.JFrame {
      private String producto;
      private String marca;
      private ResultSet rs = null;
-     private manejador_bd BD;
+     private final manejador_bd BD;
      public int tipo_historial;
      
      
@@ -49,10 +50,10 @@ public class Inventario extends javax.swing.JFrame {
      * Creates new form Inventario2
      */
     
-    
-    
-    
-    
+    /**
+     * Creates new form Inventario2
+     * @throws java.sql.SQLException
+     */
     public Inventario() throws SQLException {
        this.setTitle("Inventario.");
        this.setMinimumSize(new Dimension(800, 600)); 
@@ -67,13 +68,15 @@ public class Inventario extends javax.swing.JFrame {
     
     
     
-    public void Inventario_total () throws SQLException {
+    private void Inventario_total () throws SQLException {
         
         int i=0;
         Object data [][];
         Panel.removeAll();
-        rs = BD.st.executeQuery("select count(*) as cantidad from inventario ; ");
+        rs = manejador_bd.st.executeQuery("select count(*) as cantidad from inventario ; ");
+        boolean advertencia_inventario = true;
         
+                
         while (rs.next())
         {
           i = rs.getInt("cantidad");
@@ -82,9 +85,9 @@ public class Inventario extends javax.swing.JFrame {
   
         data = new Object [i] [9];
         
-        rs = BD.st.executeQuery("select * , (Cantidad - Sugerido) as total from inventario ; ");    
+        rs = manejador_bd.st.executeQuery("select * , (Cantidad - Sugerido) as total from inventario ; ");    
         rs.beforeFirst();
-
+        
         
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
         i=0;
@@ -99,6 +102,12 @@ public class Inventario extends javax.swing.JFrame {
                 data [i][6]= rs.getInt("total"); 
                 data [i][7]= formato.format(rs.getDate("fecha")); 
                 data [i][8]= formato.format(rs.getDate("vencimiento")); 
+                
+                if( advertencia_inventario && (int)data [i][6] <= 0 ){
+                    Mensajes_emergentes mensajes = new Mensajes_emergentes();
+                    mensajes.Mostrar_mensajes(3);
+                    advertencia_inventario = false;
+                }
                 i++;
             }
             rs.close();
@@ -109,6 +118,7 @@ public class Inventario extends javax.swing.JFrame {
             , "Fecha de compra.", "Fecha de vencimiento."};
         DefaultTableModel dtm= new DefaultTableModel(data,columnNames);
         final JTable table = new JTable(dtm){
+                          @Override
                           public boolean isCellEditable (int row, int column)
                             {
                                 return false;
@@ -131,7 +141,7 @@ public class Inventario extends javax.swing.JFrame {
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
         Panel.removeAll();
         
-        rs = BD.st.executeQuery("Select count(*) as cantidad " +
+        rs = manejador_bd.st.executeQuery("Select count(*) as cantidad " +
                                 "from inventario_has_servicios, ( " +
                                                                     "select Descripcion  " +
                                                                     "from tipo_servicio " +
@@ -153,7 +163,7 @@ public class Inventario extends javax.swing.JFrame {
         if (i >0){
             
             data = new Object [i] [5];
-            rs = BD.st.executeQuery("Select Inventario_Producto, Inventario_Marca, Automovil_Model, Automovil_Placa, Descripcion, inventario_has_servicios.Cantidad, Fecha " +
+            rs = manejador_bd.st.executeQuery("Select Inventario_Producto, Inventario_Marca, Automovil_Model, Automovil_Placa, Descripcion, inventario_has_servicios.Cantidad, Fecha " +
                                     "from inventario_has_servicios, ( " +
                                                                         "select Descripcion  " +
                                                                         "from tipo_servicio " +
@@ -190,6 +200,7 @@ public class Inventario extends javax.swing.JFrame {
                 "Cantidad.", "Fecha." };
             DefaultTableModel dtm= new DefaultTableModel(data,columnNames);
             final JTable table = new JTable(dtm){
+                              @Override
                               public boolean isCellEditable (int row, int column)
                                 {
                                     return false;
@@ -215,7 +226,7 @@ public class Inventario extends javax.swing.JFrame {
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
         Panel.removeAll();
         
-        rs = BD.st.executeQuery("select count(*) as cantidad  " +
+        rs = manejador_bd.st.executeQuery("select count(*) as cantidad  " +
                                 "from inventario_has_servicios " +
                                 "inner join servicios " +
                                 "on idServicios = Servicios_idServicios " +
@@ -228,12 +239,10 @@ public class Inventario extends javax.swing.JFrame {
         
         if (i >0){
             
-            System.out.println("Producto : " + producto);
-            System.out.println("Marca : " + marca);
 
             data = new Object [i] [3];
 
-            rs = BD.st.executeQuery("select Inventario_Producto, Inventario_Marca, sum(inventario_has_servicios.Cantidad) as Total_utilizado, servicios.Fecha  " +
+            rs = manejador_bd.st.executeQuery("select Inventario_Producto, Inventario_Marca, sum(inventario_has_servicios.Cantidad) as Total_utilizado, servicios.Fecha  " +
                                     "from inventario_has_servicios " +
                                     "inner join servicios " +
                                     "on idServicios = Servicios_idServicios " +
@@ -261,6 +270,7 @@ public class Inventario extends javax.swing.JFrame {
             String[] columnNames = {"Producto.","Total.", "Fecha." };
             DefaultTableModel dtm= new DefaultTableModel(data,columnNames);
             final JTable table = new JTable(dtm){
+                              @Override
                               public boolean isCellEditable (int row, int column)
                                 {
                                     return false;
@@ -379,16 +389,11 @@ public class Inventario extends javax.swing.JFrame {
         
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                try {
                     javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());  
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InstantiationException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (UnsupportedLookAndFeelException ex) {
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
                     Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 try {

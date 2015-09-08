@@ -7,7 +7,11 @@
 package Grafica;
 
 import Clases.CrearImagen;
+import Clases.Mensajes_emergentes;
+import Clases.manejador_bd;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -19,10 +23,12 @@ import javax.swing.UnsupportedLookAndFeelException;
  */
 public class Index extends javax.swing.JFrame {
 
+    private final manejador_bd BD;
     /**
      * Creates new form Index
+     * @throws java.sql.SQLException
      */
-    public Index() {
+    public Index() throws SQLException {
         initComponents();
         this.setTitle("Servicam.");
         this.setLocationRelativeTo(null);
@@ -34,6 +40,8 @@ public class Index extends javax.swing.JFrame {
         PanelP.add(panel2);
        CrearImagen panel3 = new CrearImagen(PanelC, "/Imagenes/Inventario.jpg");
         PanelI.add(panel3);
+        BD = new manejador_bd();
+        revisar_inventario();
        
     }
 
@@ -310,11 +318,7 @@ public class Index extends javax.swing.JFrame {
         try {
             camiones = new Cam ();
             camiones.setVisible(true);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
+        } catch (ClassNotFoundException | InstantiationException | SQLException ex) {
             Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_ConsultaCActionPerformed
@@ -401,6 +405,53 @@ public class Index extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_ServiBtnActionPerformed
 
+    private void revisar_inventario () throws SQLException{
+        int i=0;
+        ResultSet rs = null;
+        Object data [][];
+        rs = manejador_bd.st.executeQuery("select count(*) as cantidad from inventario ; ");
+        boolean advertencia_inventario = true;
+        
+                
+        while (rs.next())
+        {
+          i = rs.getInt("cantidad");
+        }
+
+  
+        data = new Object [i] [9];
+        
+        rs = manejador_bd.st.executeQuery("select * , (Cantidad - Sugerido) as total from inventario ; ");    
+        rs.beforeFirst();
+        
+        
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+        i=0;
+            while (rs.next())
+            {   
+                data [i][0]=rs.getString("Producto");
+                data [i][1]= rs.getString("Marca");
+                data [i][2]= rs.getString("Costo");
+                data [i][3]= rs.getString("Duracion");
+                data [i][4]= rs.getString("Cantidad");   
+                data [i][5]= rs.getInt("Sugerido"); 
+                data [i][6]= rs.getInt("total"); 
+                data [i][7]= formato.format(rs.getDate("fecha")); 
+                data [i][8]= formato.format(rs.getDate("vencimiento")); 
+                
+                if( advertencia_inventario && (int)data [i][6] <= 0 ){
+                    Mensajes_emergentes mensajes = new Mensajes_emergentes();
+                    mensajes.Mostrar_mensajes(3);
+                    advertencia_inventario = false;
+                }
+                i++;
+            }
+            rs.close();
+    }
+    
+    
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -417,34 +468,31 @@ public class Index extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Index.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Index.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Index.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(Index.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 
                  try {
-                    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());  
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InstantiationException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (UnsupportedLookAndFeelException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
+                     
+                     try {
+                         javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+                     } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+                         Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
+                     }
+                     
+                     new Index().setVisible(true);
+                     
+                 } catch (SQLException ex) {
+                    Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                 
-                new Index().setVisible(true);
                 
             }
         });

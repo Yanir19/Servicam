@@ -12,14 +12,9 @@ import java.awt.BorderLayout;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -67,6 +62,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
         
     }
     
+    @SuppressWarnings("empty-statement")
     public ArrayList  AgregarProducto ( final String Producto, final String Marca, ArrayList argumento_lista_productos) throws SQLException{
         
         
@@ -303,7 +299,8 @@ public class Serviciosasociados extends javax.swing.JFrame {
                             
                             rs=BD.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion, Tiempo, ta.Km " + 
                                     " FROM tipo_servicio, automovil ,tipo_servicio_has_automovil as ta"+
-                                    " WHERE ta.Automovil_Placa = '"+ Placa +"' AND idTipo_Servicio  = ta.Tipo_Servicio_idTipo_Servicio; ");
+                                    " WHERE ta.Automovil_Placa = '"+ Placa +"' AND idTipo_Servicio  = ta.Tipo_Servicio_idTipo_Servicio "
+                                    + " group by Tipo_Servicio_idTipo_Servicio asc; ");
                             
                             rs.beforeFirst();
                             
@@ -318,19 +315,23 @@ public class Serviciosasociados extends javax.swing.JFrame {
                              
                              final int aux = cont;
                              System.out.println("esto es lo que tiene aux :" + aux);
-                            
+                             System.out.println("Cont: " + cont);
+                             System.out.println("F: " + f);
                            
                            int index = 0;
                            if (aux > 0){
                                 for (int i =0; i< f ;i++ ){  
-
+                                    
+                                    System.out.println("Tiempo: " + id2[2][i]);
+                                    System.out.println("Km: " + id2[3][i]);
+                                                
                                     if (id[i] <=  (int) id2[0][aux-1]){
                                         for (int j = 0; j<aux; j++){
                                             if (id [i] == (int ) id2[0][j]){
                                                 componentes [i].servicio.setSelected(true);
                                                 
                                                 
-                                                if ( (int) id2[3][j]  > 0){
+                                                if ( (int) id2[3][j]  >= 0){
                                                      componentes [i].cantidad.setValue((int) id2[3][j]);
                                                      componentes [i].unidades.setSelectedItem("Km");
                                                 }else{
@@ -567,17 +568,12 @@ public class Serviciosasociados extends javax.swing.JFrame {
                         if (flag == 1){
 
                                 if (combo [j].getSelectedItem() == "Días" || combo [j].getSelectedItem() == "Meses"){
-                              /*  BD.st.execute("INSERT INTO tipo_servicio_has_automovil"
-                                        + "  (Tipo_Servicio_idTipo_Servicio,Automovil_Placa, Automovil_Model, Tiempo)"
-                                        + " VALUES ("+id[j]+",'"+Placa+"','"+Modelo+"' ,'"+ tiempo +"');"); */
                                     lista_camiones.add(1);
                                     lista_camiones.add(id[j]);
                                     lista_camiones.add(tiempo);
                                 }else{
-                                   /* BD.st.execute("INSERT INTO tipo_servicio_has_automovil"
-                                        + "  (Tipo_Servicio_idTipo_Servicio,Automovil_Placa, Automovil_Model, Km)"
-                                        + " VALUES ("+id[j]+",'"+Placa+"','"+Modelo+"' ,'"+ (int) spin[j].getValue()+"');"); */
-                                    lista_camiones.add(1);
+                                    
+                                    lista_camiones.add(2);
                                     lista_camiones.add(id[j]);
                                     lista_camiones.add(tiempo);
                                 }

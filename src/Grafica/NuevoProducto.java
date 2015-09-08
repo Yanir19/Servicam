@@ -428,12 +428,10 @@ public class NuevoProducto extends javax.swing.JFrame {
                            }
 
 
-                                System.out.println(Marcatext.getText());
-
                           if (acept){      
                             try {
-                                BD.st.execute("SET SQL_SAFE_UPDATES = 0;" );
-                                BD.st.execute("UPDATE  Inventario SET  Producto = '"+(String)producto[0]+"' ,Marca = '"+(String)producto[1]+"', Costo =  "+(int)producto[2]+" , "
+                                manejador_bd.st.execute("SET SQL_SAFE_UPDATES = 0;" );
+                                manejador_bd.st.execute("UPDATE  Inventario SET  Producto = '"+(String)producto[0]+"' ,Marca = '"+(String)producto[1]+"', Costo =  "+(int)producto[2]+" , "
                                         +" Cantidad = "+(int) producto[3]+" , Duracion = '"+(String)producto[4]+"' , Sugerido = '"+(int)producto[5]+"' , Fecha = '"+producto[6]+"', "
                                         +" Vencimiento = '"+producto[7]+"' "
                                         +" WHERE Producto = '"+(String)producto[0]+"' AND Marca = '"+(String)producto[1]+"' and Fecha = '"+producto[6]+"' ;" );
@@ -445,11 +443,11 @@ public class NuevoProducto extends javax.swing.JFrame {
                           }else{
                               
                                 try {
-                                    rs=BD.st.executeQuery("SELECT *  FROM Inventario "
+                                    rs=manejador_bd.st.executeQuery("SELECT *  FROM Inventario "
                                             + "WHERE Producto = '"+ Productotext.getText()+"' AND Marca = '"+Marcatext.getText() +"' ;");
                                     rs.beforeFirst();
                                     if(rs.next()){
-                                        BD.st.execute("insert into historico_inventario (Inventario_Producto, Inventario_Marca, Costo, Cantidad, Sugerido,Duracion, Fecha, Vencimiento) "
+                                        manejador_bd.st.execute("insert into historico_inventario (Inventario_Producto, Inventario_Marca, Costo, Cantidad, Sugerido,Duracion, Fecha, Vencimiento) "
                                             + " values ( '"+rs.getString("Producto")+"' , '"+rs.getString("Marca")+"' , "+rs.getFloat("Costo")+", "
                                             + " "+rs.getFloat("Cantidad")+", "+rs.getInt("Sugerido")+",'"+rs.getInt("Duracion")+"' , '"+rs.getDate("Fecha")+"', '"+rs.getDate("Vencimiento")+"' );" );
                               
@@ -462,8 +460,8 @@ public class NuevoProducto extends javax.swing.JFrame {
                                 
                                 
                                 try {
-                                BD.st.execute("SET SQL_SAFE_UPDATES = 0;" );
-                                BD.st.execute("UPDATE  Inventario SET  Producto = '"+(String)producto[0]+"' ,Marca = '"+(String)producto[1]+"', Costo =  "+(int)producto[2]+" , "
+                                manejador_bd.st.execute("SET SQL_SAFE_UPDATES = 0;" );
+                                manejador_bd.st.execute("UPDATE  Inventario SET  Producto = '"+(String)producto[0]+"' ,Marca = '"+(String)producto[1]+"', Costo =  "+(int)producto[2]+" , "
                                         +" Cantidad = "+(int) producto[3]+" , Duracion = '"+(String)producto[4]+"' , Sugerido = '"+(int)producto[5]+"' , Fecha = '"+producto[6]+"', "
                                         +" Vencimiento = '"+producto[7]+"' "
                                         +" WHERE Producto = '"+(String)producto[0]+"' AND Marca = '"+(String)producto[1]+"' and Fecha = '"+producto[6]+"' ;" );
@@ -528,13 +526,13 @@ public class NuevoProducto extends javax.swing.JFrame {
                               }else{
 
                                    if (jRadioButton2.isSelected()){
-                                       duracion.concat(" Meses");;
+                                       duracion.concat(" Meses");
                                    }else{
                                            if (jRadioButton3.isSelected()){
-                                               duracion.concat(" Km");;
+                                               duracion.concat(" Km");
                                            }else{
                                                if (jRadioButton4.isSelected()){
-                                                duracion.concat(" Litros");;
+                                                duracion.concat(" Litros");
                                            }
                                            }
                                    }
@@ -544,13 +542,13 @@ public class NuevoProducto extends javax.swing.JFrame {
                 try {
                     
                     if (DuracionCheckbox.isSelected()){
-                        BD.st.execute("INSERT INTO `servi_cam`.`inventario` (`Producto`, `Marca`, `Costo`, "
+                        manejador_bd.st.execute("INSERT INTO `servi_cam`.`inventario` (`Producto`, `Marca`, `Costo`, "
                                 + "`Cantidad`, `Duracion`, `Sugerido`, `Fecha`, `Vencimiento`) "
                                 + "VALUES ('"+ Productotext.getText()+"', '"+ Marcatext.getText()+"', '"+ Costotext.getText()+"', "
                                 + " '"+ CantidadSpinner.getValue()+"', '"+ duracion+"', '"+ SugeridoSpin.getValue()+"', "
                                 + " '"+ formato.format(Fecha.getDate())+"', '"+ formato.format(Vencimiento_Date.getDate())+"');");
                     }else{
-                        BD.st.execute("INSERT INTO `servi_cam`.`inventario` (`Producto`, `Marca`, `Costo`, "
+                        manejador_bd.st.execute("INSERT INTO `servi_cam`.`inventario` (`Producto`, `Marca`, `Costo`, "
                                 + "`Cantidad`, `Duracion`, `Sugerido`, `Fecha`, `Vencimiento`) "
                                 + "VALUES ('"+ Productotext.getText()+"', '"+ Marcatext.getText()+"', '"+ Costotext.getText()+"', "
                                 + " '"+ CantidadSpinner.getValue()+"', 0, '"+ SugeridoSpin.getValue()+"', "
@@ -560,7 +558,10 @@ public class NuevoProducto extends javax.swing.JFrame {
                     
                     asociar_producto_tipo_servicio();
            
-                    JOptionPane.showMessageDialog(null, "El producto fue agregado BD.con exito. " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "El producto fue creado con exito. " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
+                    Productotext.setText("");
+                    Marcatext.setText("");
+                    Costotext.setText("");
                     
                 } catch (SQLException ex) {
                   Errores_Mysql manejador_errores = new Errores_Mysql();
@@ -583,7 +584,7 @@ public class NuevoProducto extends javax.swing.JFrame {
 
     private void EliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EliminarActionPerformed
         try {
-            BD.st.execute("DELETE FROM `servi_cam`.`inventario` WHERE `Producto`='"+Productotext.getText()+"' and`Marca`='"+Marcatext.getText()+"' ;");
+            manejador_bd.st.execute("DELETE FROM `servi_cam`.`inventario` WHERE `Producto`='"+Productotext.getText()+"' and`Marca`='"+Marcatext.getText()+"' ;");
         } catch (SQLException ex) {
             Logger.getLogger(NuevoProducto.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -596,21 +597,14 @@ public class NuevoProducto extends javax.swing.JFrame {
     
     public void rellenar (){
         
-          System.out.println("entre a rellenar.");
-        
            if (!Productotext.getText().equals("")){
             if (!Marcatext.getText().equals("")){
               
        if ( Productotext.getText()!= null & Marcatext.getText()!= null ){
            
-           System.out.println("entre a rellenar.");
-           
-
-            System.out.println(Productotext.getText());
-            System.out.println(Marcatext.getText());
 
            try {
-               rs=BD.st.executeQuery("SELECT *  FROM Inventario "
+               rs=manejador_bd.st.executeQuery("SELECT *  FROM Inventario "
                        + "WHERE Producto = '"+ Productotext.getText()+"' AND Marca = '"+Marcatext.getText() +"' ;");
                
                
@@ -630,11 +624,9 @@ public class NuevoProducto extends javax.swing.JFrame {
                                 Fecha.setDate(rs.getDate("Fecha"));
                                 Vencimiento_Date.setDate(rs.getDate("Vencimiento"));
                                 int posicion = palabra.indexOf(" ");
-                                System.out.println(posicion);
                                 
                                 if(posicion>=0){ 
                                     DuracionSpinner.setValue(Integer.parseInt(palabra.substring(0 , posicion)));
-                                    System.out.println(palabra.substring(0 , posicion));
                                     palabra = palabra.substring(posicion+1);
                                     if (palabra.equals("Dias")){
                                         jRadioButton1.setSelected(true);
@@ -683,7 +675,7 @@ public class NuevoProducto extends javax.swing.JFrame {
               
                     while(iterador_de_lista.hasNext()){
                         try {
-                            BD.st.execute("INSERT INTO inventario_has_tipo_servicio ( Inventario_Producto, Inventario_Marca, Tipo_Servicio_idTipo_Servicio ) " +
+                            manejador_bd.st.execute("INSERT INTO inventario_has_tipo_servicio ( Inventario_Producto, Inventario_Marca, Tipo_Servicio_idTipo_Servicio ) " +
                                           "SELECT '"+ Productotext.getText()+"' , '"+ Marcatext.getText()+"' ,  "+iterador_de_lista.next()+"  " +
                                           "FROM dual " +
                                           "WHERE NOT EXISTS (SELECT * FROM inventario_has_tipo_servicio " +
@@ -697,7 +689,7 @@ public class NuevoProducto extends javax.swing.JFrame {
     }
     
     
-    public void activar_desactivar_duracion (){
+    private void activar_desactivar_duracion (){
         if (DuracionCheckbox.isSelected()){
           DuracionSpinner.setEnabled(true);
           jRadioButton1.setEnabled(true);
@@ -729,29 +721,20 @@ public class NuevoProducto extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(NuevoProducto.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(NuevoProducto.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(NuevoProducto.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(NuevoProducto.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                  try {
                     javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());  
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InstantiationException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (UnsupportedLookAndFeelException ex) {
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
                     Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 try {

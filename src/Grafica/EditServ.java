@@ -6,11 +6,8 @@
 package Grafica;
 
 import Clases.manejador_bd;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -193,7 +190,7 @@ public class EditServ extends javax.swing.JFrame {
         Nombrelbl.setText(seleccion);
         
         try {
-            rs = BD.st.executeQuery("select Automovil_Model, Automovil_Placa, Razon_Social, Inventario_Marca, Inventario_Producto " +
+            rs = manejador_bd.st.executeQuery("select Automovil_Model, Automovil_Placa, Razon_Social, Inventario_Marca, Inventario_Producto " +
                                 "from (select idTipo_Servicio from tipo_servicio where Descripcion = '"+seleccion+"') as ts " +
                                 "right join tipo_servicio_has_automovil  " +
                                 "on ts.idTipo_Servicio = tipo_servicio_has_automovil.Tipo_Servicio_idTipo_Servicio  " +
@@ -235,7 +232,7 @@ public class EditServ extends javax.swing.JFrame {
     private void AceptarbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AceptarbtnActionPerformed
         
         try {
-            BD.st.execute("UPDATE tipo_servicio SET  Descripcion = '"+Serviciotextfield.getText()+"' WHERE Descripcion = '"+Nombrelbl.getText()+"' ;");
+            manejador_bd.st.execute("UPDATE tipo_servicio SET  Descripcion = '"+Serviciotextfield.getText()+"' WHERE Descripcion = '"+Nombrelbl.getText()+"' ;");
             rellenar();
             Nombrelbl.setText(Serviciotextfield.getText());
             this.getContentPane().remove(Aceptarbtn);
@@ -257,18 +254,19 @@ public class EditServ extends javax.swing.JFrame {
 
     private void EliminarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EliminarBtnActionPerformed
         try {
-            BD.st.execute("DELETE FROM `servi_cam`.`tipo_servicio` WHERE `Descripcion`='"+Nombrelbl.getText()+"';");
+            manejador_bd.st.execute("DELETE FROM `servi_cam`.`tipo_servicio` WHERE `Descripcion`='"+Nombrelbl.getText()+"';");
             rellenar ();
         } catch (SQLException ex) {
             Logger.getLogger(EditServ.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_EliminarBtnActionPerformed
 
+    @SuppressWarnings("empty-statement")
     private void rellenar () throws SQLException{
             
             Servicioslist.removeAll();
             Productoslist.removeAll();
-           rs = BD.st.executeQuery("SELECT Descripcion FROM servi_cam.tipo_servicio;");
+           rs = manejador_bd.st.executeQuery("SELECT Descripcion FROM servi_cam.tipo_servicio;");
             int i;
             
             for(i=0; rs.next(); i++);
@@ -279,7 +277,6 @@ public class EditServ extends javax.swing.JFrame {
             for(i=0; rs.next(); i++)
             {
                 
-             System.out.println( servicios [i] = rs.getString("Descripcion"));
             }
             
             
@@ -312,29 +309,20 @@ public class EditServ extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(EditServ.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(EditServ.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(EditServ.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(EditServ.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                  try {
                     javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());  
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InstantiationException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (UnsupportedLookAndFeelException ex) {
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
                     Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }

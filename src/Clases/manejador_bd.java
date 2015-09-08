@@ -30,9 +30,7 @@ public class manejador_bd {
             
             try {
                 Class.forName("com.mysql.jdbc.Driver").newInstance();
-            } catch (InstantiationException ex) {
-                Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
+            } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
             }
             
@@ -40,7 +38,7 @@ public class manejador_bd {
            Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        con = DriverManager.getConnection("jdbc:mysql://localhost/servi_cam", "root", "");
+        con = DriverManager.getConnection("jdbc:mysql://192.168.1.106/servi_cam", "root", "root");
 
         st  = con.createStatement();
     }

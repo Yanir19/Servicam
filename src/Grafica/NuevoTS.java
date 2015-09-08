@@ -126,7 +126,7 @@ public class NuevoTS extends javax.swing.JFrame {
         boolean flag = true;
         
         try {
-            BD.st.execute( "INSERT INTO  Tipo_Servicio (Descripcion) VALUES ('"+ ServicioTEXT.getText()+ "');" );
+            manejador_bd.st.execute( "INSERT INTO  Tipo_Servicio (Descripcion) VALUES ('"+ ServicioTEXT.getText()+ "');" );
             JOptionPane.showMessageDialog(null, "El servicio fue creado con exito." ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
             ServicioTEXT.setText("");
         } catch (SQLException ex) {          
@@ -139,7 +139,7 @@ public class NuevoTS extends javax.swing.JFrame {
     private void EliminarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EliminarBtnActionPerformed
        
         try {
-            BD.st.execute(" DELETE FROM tipo_servicio  "
+            manejador_bd.st.execute(" DELETE FROM tipo_servicio  "
                        + " WHERE Descripcion='"+ServicioTEXT.getText()+ "' ;");
             JOptionPane.showMessageDialog(null, "El servicio fue eliminado con exito." ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
             ServicioTEXT.setText("");
@@ -169,19 +169,16 @@ public class NuevoTS extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(NuevoTS.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(NuevoTS.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(NuevoTS.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(NuevoTS.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 try {
                     new NuevoTS().setVisible(true);

@@ -7,10 +7,8 @@
 package Grafica;
 
 import Clases.manejador_bd;
-import java.awt.Button;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -27,7 +25,7 @@ import javax.swing.UnsupportedLookAndFeelException;
  */
 public class NuevoCam extends javax.swing.JFrame {
 
-    private Serviciosasociados serv;
+    private final Serviciosasociados serv;
     private ResultSet rs = null;
     private static manejador_bd BD;
     private  static ArrayList lista_servicios_asociados = new ArrayList(); 
@@ -222,8 +220,8 @@ public class NuevoCam extends javax.swing.JFrame {
         camion [3] =Kilometrajespin.getValue();
         
         
-        if ( !camion [1].equals("") ){
-           if(!camion [0].equals("")){
+        if ( !camion [0].equals("") ){
+           if(!camion [1].equals("")){
                if( (int)camion [3] >= 0){   
                    if(Jdate.getDate()!= null){   
                        SimpleDateFormat formato = new SimpleDateFormat("YYYY/MM/dd");
@@ -236,10 +234,10 @@ public class NuevoCam extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "El campo 'Kilometraje' no puede ser negativo " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
                 }     
             }else{
-                JOptionPane.showMessageDialog(null, "El campo 'Placa' no puede estar vacío " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "El campo 'Modelo' no puede estar vacío " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
             }     
         }else{
-            JOptionPane.showMessageDialog(null, "El campo 'Modelo' no puede estar vacío " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, " El campo 'Placa' no puede estar vacío" ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
         }
         
         
@@ -251,7 +249,7 @@ public class NuevoCam extends javax.swing.JFrame {
        int cont = 0 ;
        int i = 0;
         try {
-            BD.st.execute("INSERT INTO automovil VALUES ('"+camion[0]+"','"+camion[1]+"','"
+            manejador_bd.st.execute("INSERT INTO automovil VALUES ('"+camion[0]+"','"+camion[1]+"','"
                     +camion[2]+"',"+camion[3]+",'"+camion[4]+"') ; ");
         } catch (SQLException ex) {
             Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
@@ -277,7 +275,7 @@ public class NuevoCam extends javax.swing.JFrame {
         Pl = Placatext.getText();
          
         try {
-            rs= BD.st.executeQuery("SELECT * FROM automovil WHERE Placa = '"+ Pl + "' ; ");
+            rs= manejador_bd.st.executeQuery("SELECT * FROM automovil WHERE Placa = '"+ Pl + "' ; ");
             rs.beforeFirst();
         } catch (SQLException ex) {
             Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
@@ -307,7 +305,7 @@ public class NuevoCam extends javax.swing.JFrame {
                         
                         try {
                             Asociar_camion_con_servicios();
-                            BD.st.execute("UPDATE automovil"
+                            manejador_bd.st.execute("UPDATE automovil"
                                     + " SET Placa = '" + Placatext.getText() + "' , Model = '" + Modelotext.getText() + "' , "
                                     + "Chofer = '" + Chofertext.getText() + "' , Km = " + Kilometrajespin.getValue()
                                     + " WHERE Placa = '"+ Pl +"' AND Model = '"+ Modelotext.getText() + "' ; ");
@@ -315,6 +313,7 @@ public class NuevoCam extends javax.swing.JFrame {
                         } catch (SQLException ex) {
                               JOptionPane.showMessageDialog(null, "Codigo de error : " + ex.getErrorCode()  + " \n " + ex  + "\n" + 
                                       "Clase: NuevoCam " + "\n" +  "Método: AceptaractionPerformed ()" ,"Error.", JOptionPane.ERROR_MESSAGE);   
+                               Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
         
                         }
                         
@@ -332,6 +331,7 @@ public class NuevoCam extends javax.swing.JFrame {
        
     }//GEN-LAST:event_EditarbtnActionPerformed
 
+    @SuppressWarnings("empty-statement")
     private void AsociarbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AsociarbtnActionPerformed
            boolean flag = false;
         Object camion [] = new Object [5];
@@ -370,7 +370,7 @@ public class NuevoCam extends javax.swing.JFrame {
        int cont = 0 ;
         
         try {
-            rs=BD.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " +
+            rs=manejador_bd.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " +
                     " FROM tipo_servicio, automovil ,tipo_servicio_has_automovil as ta"+
                     " WHERE ta.Automovil_Placa = '"+ camion [0] +"' AND ta.Automovil_Model = '"+ camion [1] +"' AND idTipo_Servicio  = ta.Tipo_Servicio_idTipo_Servicio; ");
         } catch (SQLException ex) {
@@ -427,52 +427,32 @@ public class NuevoCam extends javax.swing.JFrame {
 
   private void  Asociar_camion_con_servicios () throws SQLException{
         
-     System.out.println("Entre a asociar");
-     System.out.println("tamano de lista : " + lista_servicios_asociados.size());
     for (int i = 0; i+2 <=  lista_servicios_asociados.size(); i+=3 ){
             
-        System.out.println("Contenido de lista : " + lista_servicios_asociados.get(i) + " posicion : " + i );
-        
         switch ((int)lista_servicios_asociados.get(i)) {
 
             case 1:
-                System.out.println("case 1");
-                System.out.println("tiempo : " + lista_servicios_asociados.get(i+2));
-                System.out.println("Placa : "  + Placatext.getText());
-                System.out.println("Modelo : " + Modelotext.getText());
-                BD.st.execute("INSERT INTO tipo_servicio_has_automovil"
+                manejador_bd.st.execute("INSERT INTO tipo_servicio_has_automovil"
                                     + "  (Tipo_Servicio_idTipo_Servicio,Automovil_Placa, Automovil_Model, Tiempo)"
                                     + " VALUES ("+lista_servicios_asociados.get(i+1)+",'"+Placatext.getText()+"','"+Modelotext.getText()+"' ,'"+ lista_servicios_asociados.get(i+2) +"');");
                 break;
 
             case 2:
-                System.out.println("case 2");
-                System.out.println("tiempo : " + lista_servicios_asociados.get(i+2));
-                System.out.println("Placa : "  + Placatext.getText());
-                System.out.println("Modelo : " + Modelotext.getText());
-                BD.st.execute("INSERT INTO tipo_servicio_has_automovil"
+                manejador_bd.st.execute("INSERT INTO tipo_servicio_has_automovil"
                                 + "  (Tipo_Servicio_idTipo_Servicio,Automovil_Placa, Automovil_Model, Km)"
                                 + " VALUES ("+lista_servicios_asociados.get(i+1)+",'"+Placatext.getText()+"','"+Modelotext.getText()+"' ,"+ lista_servicios_asociados.get(i+2) +");");
                 break;
 
             case 3:
                 
-                System.out.println("case 3");
-                System.out.println("tiempo : " + lista_servicios_asociados.get(i+2));
-                System.out.println("Placa : "  + Placatext.getText());
-                System.out.println("Modelo : " + Modelotext.getText());
-                BD.st.execute("UPDATE tipo_servicio_has_automovil"
+                manejador_bd.st.execute("UPDATE tipo_servicio_has_automovil"
                                     + " SET Km = '" + lista_servicios_asociados.get(i+2) + "', Tiempo = NULL "
                                     + " WHERE Automovil_Placa = '"+ Placatext.getText() +"' AND Automovil_Model = '"+ Modelotext.getText() +"' AND Tipo_Servicio_idTipo_Servicio = '" +lista_servicios_asociados.get(i+1) +"'; ");
 
                 break;
 
             case 4:
-                System.out.println("case 4");
-                System.out.println("tiempo : " + lista_servicios_asociados.get(i+2));
-                System.out.println("Placa : "  + Placatext.getText());
-                System.out.println("Modelo : " + Modelotext.getText());
-                BD.st.execute("UPDATE tipo_servicio_has_automovil"
+                manejador_bd.st.execute("UPDATE tipo_servicio_has_automovil"
                                     + " SET Tiempo = '" + lista_servicios_asociados.get(i+2) + "' , Km = NULL"
                                     + " WHERE Automovil_Placa = '"+ Placatext.getText() +"' AND Automovil_Model = '"+ Modelotext.getText()+"' AND Tipo_Servicio_idTipo_Servicio = '" +lista_servicios_asociados.get(i+1) +"'; ");
                 break;
@@ -505,32 +485,21 @@ public class NuevoCam extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(NuevoCam.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(NuevoCam.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(NuevoCam.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(NuevoCam.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 try {
                     javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());  
                     new NuevoCam().setVisible(true);
-                } catch (SQLException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InstantiationException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (UnsupportedLookAndFeelException ex) {
+                } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
                     Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }

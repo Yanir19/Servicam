@@ -11,8 +11,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.ScrollPane;
 import java.awt.Toolkit;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,7 +32,7 @@ public class Cam extends javax.swing.JFrame {
      */
     
     
-    private JTabbedPane pestana = new JTabbedPane();
+    private final JTabbedPane pestana = new JTabbedPane();
     private static manejador_bd BD; 
     
     
@@ -52,7 +50,7 @@ public class Cam extends javax.swing.JFrame {
         int i=0;
         int aux=0;
         
-        rs = BD.st.executeQuery("SELECT * FROM automovil");
+        rs = manejador_bd.st.executeQuery("SELECT * FROM automovil");
         Toolkit tk = Toolkit.getDefaultToolkit();
         Dimension tamano = tk.getScreenSize();
         pestana.setPreferredSize(new Dimension(tamano));
@@ -84,7 +82,6 @@ public class Cam extends javax.swing.JFrame {
         
         for (i=0; i!=aux;i++){
           
-          System.out.println("Km en Cam : " + (int) data[i][3] );  
           panel [i] = new Panelcam(data,i);
           panel [i].setSize(new Dimension(300, 300));
           panel [i].setMaximumSize(new Dimension(300, 300));
@@ -134,38 +131,25 @@ public class Cam extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Cam.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Cam.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Cam.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(Cam.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 try {
                     javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());  
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InstantiationException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (UnsupportedLookAndFeelException ex) {
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
                     Logger.getLogger(NuevoCam.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 try {
                     new Cam().setVisible(true);
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InstantiationException ex) {
-                    Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (SQLException ex) {
+                } catch (ClassNotFoundException | InstantiationException | SQLException ex) {
                     Logger.getLogger(Cam.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }

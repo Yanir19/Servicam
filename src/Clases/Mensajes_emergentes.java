@@ -5,7 +5,6 @@
  */
 package Clases;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
@@ -15,10 +14,10 @@ import javax.swing.JOptionPane;
  */
 public class Mensajes_emergentes {
     
-    ArrayList lista;
+    private ArrayList lista;
 
     public Mensajes_emergentes() {
-        
+        this.lista = new ArrayList();
     }
 
     public ArrayList getLista() {
@@ -28,13 +27,28 @@ public class Mensajes_emergentes {
     public void setLista(ArrayList lista) {
         this.lista = lista;
     }
-            
+    
+    public void add(Object lista) {
+        this.lista.add(lista);
+    }
+    
+    public void clear() {
+        this.lista.clear();
+    }
+    
     public void Mostrar_mensajes (int id ){
         
         switch (id){
             case 1:
                  JOptionPane.showMessageDialog(null, "El camion "+ lista.get(0)+" - "+lista.get(1)+" posee 1 o más servicios que deben realizarse","Advertencia", JOptionPane.WARNING_MESSAGE);
                  break;
+            case 2:
+                 JOptionPane.showMessageDialog(null, "El servicio "+ lista.get(0)+ " no tiene ningun proveedor asociado.","Advertencia", JOptionPane.WARNING_MESSAGE);
+                 break;
+            case 3:
+                JOptionPane.showMessageDialog(null, "Necesita realizar un pedido de algunos productos del inventario.","Advertencia", JOptionPane.WARNING_MESSAGE);
+                break;
+            
         }
         
     }
