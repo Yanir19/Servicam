@@ -14,7 +14,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -35,11 +34,14 @@ public class NuevoProducto extends javax.swing.JFrame {
     private ResultSet rs = null;
     private boolean acept = true; 
     private int idproducto ;
+    private String producto_anterior [] = new String [2];
     private static ArrayList lista_servicios_asociados = new ArrayList(); 
+    
     public NuevoProducto() throws SQLException {
         initComponents();
         this.setTitle("Crear un nuevo producto.");
-        this.getContentPane().remove(Aceptar);
+        this.getContentPane().remove(Aceptarbtn);
+        this.getContentPane().remove(Atrasbtn);
         java.util.Date date = new Date();
         BD = new manejador_bd();
         try {
@@ -99,13 +101,14 @@ public class NuevoProducto extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         Vencimiento_Date = new com.toedter.calendar.JDateChooser();
         jRadioButton4 = new javax.swing.JRadioButton();
-        Aceptar = new javax.swing.JButton();
+        Aceptarbtn = new javax.swing.JButton();
         Editar = new javax.swing.JButton();
         AgregarServicio = new javax.swing.JButton();
         Agregar = new javax.swing.JButton();
         Salir = new javax.swing.JButton();
         Eliminar = new javax.swing.JButton();
         DuracionCheckbox = new javax.swing.JCheckBox();
+        Atrasbtn = new javax.swing.JButton();
 
         jTextField1.setText("jTextField1");
 
@@ -122,6 +125,15 @@ public class NuevoProducto extends javax.swing.JFrame {
         Costo.setText("Costo");
 
         Kilometraje.setText("Cantidad");
+
+        Productotext.setText("EMPACADURAS CIGUEÑAL");
+
+        Marcatext.setText("ISUZU");
+        Marcatext.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MarcatextActionPerformed(evt);
+            }
+        });
 
         buttonGroup1.add(jRadioButton1);
         jRadioButton1.setText("Días");
@@ -163,10 +175,10 @@ public class NuevoProducto extends javax.swing.JFrame {
         buttonGroup1.add(jRadioButton4);
         jRadioButton4.setText("Litros");
 
-        Aceptar.setText("Aceptar");
-        Aceptar.addActionListener(new java.awt.event.ActionListener() {
+        Aceptarbtn.setText("Aceptar");
+        Aceptarbtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                AceptarActionPerformed(evt);
+                AceptarbtnActionPerformed(evt);
             }
         });
 
@@ -212,79 +224,92 @@ public class NuevoProducto extends javax.swing.JFrame {
             }
         });
 
+        Atrasbtn.setText("Atras");
+        Atrasbtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AtrasbtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addComponent(Producto)
-                .addGap(32, 32, 32)
-                .addComponent(Productotext, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addComponent(Marca)
-                .addGap(46, 46, 46)
-                .addComponent(Marcatext, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addComponent(Costo)
-                .addGap(47, 47, 47)
-                .addComponent(Costotext, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addComponent(FechaLb)
-                .addGap(46, 46, 46)
-                .addComponent(Fecha, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addComponent(Vencimiento_Date, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addComponent(Kilometraje)
-                .addGap(32, 32, 32)
-                .addComponent(CantidadSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(31, 31, 31)
-                .addComponent(jLabel2)
-                .addGap(32, 32, 32)
-                .addComponent(SugeridoSpin, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addComponent(DuracionCheckbox))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(31, 31, 31)
-                .addComponent(jLabel3)
-                .addGap(18, 18, 18)
-                .addComponent(DuracionSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(68, 68, 68)
-                .addComponent(jRadioButton1)
-                .addGap(18, 18, 18)
-                .addComponent(jRadioButton2)
-                .addGap(18, 18, 18)
-                .addComponent(jRadioButton3)
-                .addGap(18, 18, 18)
-                .addComponent(jRadioButton4))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(31, 31, 31)
-                .addComponent(ServicioLabel)
-                .addGap(66, 66, 66)
-                .addComponent(AgregarServicio))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(59, 59, 59)
-                .addComponent(Agregar, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(Editar, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(Eliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(59, 59, 59)
-                .addComponent(Aceptar, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(118, 118, 118)
-                .addComponent(Salir, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addComponent(Producto)
+                        .addGap(32, 32, 32)
+                        .addComponent(Productotext, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addComponent(Marca)
+                        .addGap(46, 46, 46)
+                        .addComponent(Marcatext, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addComponent(Costo)
+                        .addGap(47, 47, 47)
+                        .addComponent(Costotext, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addComponent(FechaLb)
+                        .addGap(46, 46, 46)
+                        .addComponent(Fecha, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
+                        .addComponent(Vencimiento_Date, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addComponent(Kilometraje)
+                        .addGap(32, 32, 32)
+                        .addComponent(CantidadSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(31, 31, 31)
+                        .addComponent(jLabel2)
+                        .addGap(32, 32, 32)
+                        .addComponent(SugeridoSpin, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addComponent(DuracionCheckbox))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(31, 31, 31)
+                        .addComponent(jLabel3)
+                        .addGap(18, 18, 18)
+                        .addComponent(DuracionSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(68, 68, 68)
+                        .addComponent(jRadioButton1)
+                        .addGap(18, 18, 18)
+                        .addComponent(jRadioButton2)
+                        .addGap(18, 18, 18)
+                        .addComponent(jRadioButton3)
+                        .addGap(18, 18, 18)
+                        .addComponent(jRadioButton4))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(31, 31, 31)
+                        .addComponent(ServicioLabel)
+                        .addGap(66, 66, 66)
+                        .addComponent(AgregarServicio))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(59, 59, 59)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(Agregar, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(Editar, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(Aceptarbtn, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(Atrasbtn, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(Salir, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(Eliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(42, 42, 42))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -345,19 +370,25 @@ public class NuevoProducto extends javax.swing.JFrame {
                     .addComponent(jRadioButton2)
                     .addComponent(jRadioButton3)
                     .addComponent(jRadioButton4))
-                .addGap(27, 27, 27)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(ServicioLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(AgregarServicio))
-                .addGap(26, 26, 26)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(Agregar)
-                    .addComponent(Editar)
-                    .addComponent(Eliminar))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(Aceptar)
-                    .addComponent(Salir)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(27, 27, 27)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(ServicioLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(AgregarServicio))
+                        .addGap(26, 26, 26)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(Agregar)
+                            .addComponent(Editar)
+                            .addComponent(Eliminar))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(Salir))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(Aceptarbtn)
+                            .addComponent(Atrasbtn))))
+                .addContainerGap())
         );
 
         Productotext.getAccessibleContext().setAccessibleName("Modelo");
@@ -401,7 +432,7 @@ public class NuevoProducto extends javax.swing.JFrame {
         
     }//GEN-LAST:event_AgregarServicioActionPerformed
 
-    private void AceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AceptarActionPerformed
+    private void AceptarbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AceptarbtnActionPerformed
        
         
             if (!Productotext.getText().equals("")){
@@ -442,15 +473,20 @@ public class NuevoProducto extends javax.swing.JFrame {
 
 
                           if (acept){      
+                              System.out.println("estoy entrando a modificar los datos del producto");
                             try {
+                                System.out.println(" Producto = '"+(String)producto[0]+"'");
+                                System.out.println(" Marca = '"+(String)producto[1]+"'");
                                 manejador_bd.st.execute("SET SQL_SAFE_UPDATES = 0;" );
-                                manejador_bd.st.execute("UPDATE  Inventario SET  Producto = '"+(String)producto[0]+"' ,Marca = '"+(String)producto[1]+"', Costo =  "+(int)producto[2]+" , "
+                                manejador_bd.st.execute("UPDATE inventario SET  Producto = '"+(String)producto[0]+"' ,Marca = '"+(String)producto[1]+"', Costo =  "+(int)producto[2]+" , "
                                         +" Cantidad = "+(int) producto[3]+" , Duracion = '"+(String)producto[4]+"' , Sugerido = '"+(int)producto[5]+"' , Fecha = '"+producto[6]+"', "
                                         +" Vencimiento = '"+producto[7]+"' "
-                                        +" WHERE Producto = '"+(String)producto[0]+"' AND Marca = '"+(String)producto[1]+"' and Fecha = '"+producto[6]+"' ;" );
+                                        +" WHERE Producto = '"+producto_anterior[0]+"' AND Marca = '"+producto_anterior[1]+"' ;" );
                             } catch (SQLException ex) {
                                 Logger.getLogger(NuevoProducto.class.getName()).log(Level.SEVERE, null, ex);
                             }
+                            
+                            System.out.println("Ya updatie y ahora me voy ");
                             dispose();
                             
                           }else{
@@ -492,7 +528,8 @@ public class NuevoProducto extends javax.swing.JFrame {
                             this.add(Editar);
                             this.add(Agregar);
                             lista_servicios_asociados.clear();
-                            this.getContentPane().remove(Aceptar);
+                            this.getContentPane().remove(Aceptarbtn);
+                            this.getContentPane().remove(Atrasbtn);
                             repaint();
                             dispose();
                            }else{
@@ -514,9 +551,12 @@ public class NuevoProducto extends javax.swing.JFrame {
             
        
         
-    }//GEN-LAST:event_AceptarActionPerformed
+    }//GEN-LAST:event_AceptarbtnActionPerformed
 
     private void EditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditarActionPerformed
+       
+       producto_anterior [0] = Productotext.getText();
+       producto_anterior [1] = Marcatext.getText();
        rellenar();
        acept = true;
        
@@ -527,74 +567,77 @@ public class NuevoProducto extends javax.swing.JFrame {
     }//GEN-LAST:event_SalirActionPerformed
 
     private void AgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AgregarActionPerformed
-  
+        
+        
         if (!Productotext.getText().equals("") && !Marcatext.getText().equals("") ){
             
-            if(!lista_servicios_asociados.isEmpty()){
-                int idinv = 0 ;
-                String duracion = DuracionSpinner.getValue().toString();
-                SimpleDateFormat formato = new SimpleDateFormat("YYYY/MM/dd");
-                if (DuracionCheckbox.isSelected()){
-                    if (jRadioButton1.isSelected()){
-                                 duracion.concat(" Días");
-                              }else{
-
-                                   if (jRadioButton2.isSelected()){
-                                       duracion.concat(" Meses");
-                                   }else{
-                                           if (jRadioButton3.isSelected()){
-                                               duracion.concat(" Km");
-                                           }else{
-                                               if (jRadioButton4.isSelected()){
-                                                duracion.concat(" Litros");
-                                           }
-                                           }
-                                   }
-                              }
-                }
-
-                try {
-                    
+            try {
+                verificar_producto_servicio();
+                if(!rs.wasNull()){
+                    int idinv = 0 ;
+                    String duracion = DuracionSpinner.getValue().toString();
+                    SimpleDateFormat formato = new SimpleDateFormat("YYYY/MM/dd");
                     if (DuracionCheckbox.isSelected()){
-                        manejador_bd.st.execute("INSERT INTO `servi_cam`.`inventario` (`Producto`, `Marca`, `Costo`, "
-                                + "`Cantidad`, `Duracion`, `Sugerido`, `Fecha`, `Vencimiento`) "
-                                + "VALUES ('"+ Productotext.getText()+"', '"+ Marcatext.getText()+"', '"+ Costotext.getText()+"', "
-                                + " '"+ CantidadSpinner.getValue()+"', '"+ duracion+"', '"+ SugeridoSpin.getValue()+"', "
-                                + " '"+ formato.format(Fecha.getDate())+"', '"+ formato.format(Vencimiento_Date.getDate())+"');");
-                    }else{
-                        manejador_bd.st.execute("INSERT INTO `servi_cam`.`inventario` (`Producto`, `Marca`, `Costo`, "
-                                + "`Cantidad`, `Duracion`, `Sugerido`, `Fecha`, `Vencimiento`) "
-                                + "VALUES ('"+ Productotext.getText()+"', '"+ Marcatext.getText()+"', '"+ Costotext.getText()+"', "
-                                + " '"+ CantidadSpinner.getValue()+"', 0, '"+ SugeridoSpin.getValue()+"', "
-                                + " '"+ formato.format(Fecha.getDate())+"', '"+ formato.format(Vencimiento_Date.getDate())+"');");
+                        if (jRadioButton1.isSelected()){
+                            duracion.concat(" Días");
+                        }else{
+                            
+                            if (jRadioButton2.isSelected()){
+                                duracion.concat(" Meses");
+                            }else{
+                                if (jRadioButton3.isSelected()){
+                                    duracion.concat(" Km");
+                                }else{
+                                    if (jRadioButton4.isSelected()){
+                                        duracion.concat(" Litros");
+                                    }
+                                }
+                            }
+                        }
                     }
                     
+                    try {
+                        
+                        if (DuracionCheckbox.isSelected()){
+                            manejador_bd.st.execute("INSERT INTO `servi_cam`.`inventario` (`Producto`, `Marca`, `Costo`, "
+                                    + "`Cantidad`, `Duracion`, `Sugerido`, `Fecha`, `Vencimiento`) "
+                                    + "VALUES ('"+ Productotext.getText()+"', '"+ Marcatext.getText()+"', '"+ Costotext.getText()+"', "
+                                    + " '"+ CantidadSpinner.getValue()+"', '"+ duracion+"', '"+ SugeridoSpin.getValue()+"', "
+                                    + " '"+ formato.format(Fecha.getDate())+"', '"+ formato.format(Vencimiento_Date.getDate())+"');");
+                        }else{
+                            manejador_bd.st.execute("INSERT INTO `servi_cam`.`inventario` (`Producto`, `Marca`, `Costo`, "
+                                    + "`Cantidad`, `Duracion`, `Sugerido`, `Fecha`, `Vencimiento`) "
+                                    + "VALUES ('"+ Productotext.getText()+"', '"+ Marcatext.getText()+"', '"+ Costotext.getText()+"', "
+                                    + " '"+ CantidadSpinner.getValue()+"', 0, '"+ SugeridoSpin.getValue()+"', "
+                                    + " '"+ formato.format(Fecha.getDate())+"', '"+ formato.format(Vencimiento_Date.getDate())+"');");
+                        }
+                        
+                        
+                        asociar_producto_tipo_servicio();
+                        
+                        JOptionPane.showMessageDialog(null, "El producto fue creado con exito. " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
+                        lista_servicios_asociados.clear();
+                        Productotext.setText("");
+                        Marcatext.setText("");
+                        Costotext.setText("");
+                        
+                    } catch (SQLException ex) {
+                        Errores_Mysql manejador_errores = new Errores_Mysql();
+                        manejador_errores.Manejador_codigo_error(ex);
+                        
+                    }
                     
-                    asociar_producto_tipo_servicio();
-           
-                    JOptionPane.showMessageDialog(null, "El producto fue creado con exito. " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
-                    lista_servicios_asociados.clear();
-                    Productotext.setText("");
-                    Marcatext.setText("");
-                    Costotext.setText("");
-                    
-                } catch (SQLException ex) {
-                  Errores_Mysql manejador_errores = new Errores_Mysql();
-                  manejador_errores.Manejador_codigo_error(ex);
-                 
+                }else{
+                    JOptionPane.showMessageDialog(null, "Debe seleccionar al menos 1 servicio. " ,"Informacion", JOptionPane.WARNING_MESSAGE);
                 }
-
-
-                
-                
-            }else{
-                JOptionPane.showMessageDialog(null, "Debe seleccionar al menos 1 servicio. " ,"Informacion", JOptionPane.WARNING_MESSAGE);
+            } catch (SQLException ex) {
+                Logger.getLogger(NuevoProducto.class.getName()).log(Level.SEVERE, null, ex);
             }
         }else{
             JOptionPane.showMessageDialog(null, "Los campos 'Producto' y 'Marca' no pueden estar vacios. " ,"Informacion", JOptionPane.WARNING_MESSAGE);
         }
         
-       acept = false;
+    //   acept = false;
     }//GEN-LAST:event_AgregarActionPerformed
 
     private void EliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EliminarActionPerformed
@@ -608,6 +651,18 @@ public class NuevoProducto extends javax.swing.JFrame {
     private void DuracionCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DuracionCheckboxActionPerformed
       activar_desactivar_duracion ();
     }//GEN-LAST:event_DuracionCheckboxActionPerformed
+
+    private void AtrasbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AtrasbtnActionPerformed
+        this.add(Editar);
+        this.add(Agregar);
+        this.getContentPane().remove(Aceptarbtn);
+        this.getContentPane().remove(Atrasbtn);
+        repaint();
+    }//GEN-LAST:event_AtrasbtnActionPerformed
+
+    private void MarcatextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MarcatextActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_MarcatextActionPerformed
 
     
     public void rellenar (){
@@ -623,15 +678,20 @@ public class NuevoProducto extends javax.swing.JFrame {
                        + "WHERE Producto = '"+ Productotext.getText()+"' AND Marca = '"+Marcatext.getText() +"' ;");
                
                
+               
+               
                rs.beforeFirst();
                
 
                       if (rs.next()){
                        
-                                this.getContentPane().remove(Editar);
-                                this.Aceptar.setBounds(this.Agregar.getBounds());
+                                
+                                this.Aceptarbtn.setBounds(this.Agregar.getBounds());
+                                this.Atrasbtn.setBounds(this.Editar.getBounds());
                                 this.getContentPane().remove(Agregar);
-                                this.add(Aceptar);
+                                this.getContentPane().remove(Editar);
+                                this.add(Aceptarbtn);
+                                this.add(Atrasbtn);
                                 repaint();
                                 Costotext.setText(Integer.toString(rs.getInt("Costo")));
                                 CantidadSpinner.setValue(rs.getInt("Cantidad"));
@@ -717,6 +777,29 @@ public class NuevoProducto extends javax.swing.JFrame {
         }
         
     }
+    
+    private void verificar_producto_servicio(){
+        try {
+                
+            if(acept){
+
+                rs=manejador_bd.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " +
+                        " FROM tipo_servicio , Inventario_has_Tipo_Servicio as ta"+
+                        " WHERE ta.Inventario_Producto = '"+ producto_anterior[0] +"' and  ta.Inventario_Marca = '"+ producto_anterior[1]  +"' AND idTipo_Servicio  = ta.Tipo_Servicio_idTipo_Servicio"
+                        + "  group by Tipo_Servicio_idTipo_Servicio asc; ");
+
+            }else{
+                rs=manejador_bd.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " +
+                    " FROM tipo_servicio , Inventario_has_Tipo_Servicio as ta"+
+                    " WHERE ta.Inventario_Producto = '"+ producto_anterior[0] +"' and  ta.Inventario_Marca = '"+ producto_anterior[1]  +"' AND idTipo_Servicio  = ta.Tipo_Servicio_idTipo_Servicio"
+                    + "  group by Tipo_Servicio_idTipo_Servicio asc; ");
+            }
+        } catch (SQLException ex) {
+                Logger.getLogger(NuevoProducto.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -759,9 +842,10 @@ public class NuevoProducto extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton Aceptar;
+    private javax.swing.JButton Aceptarbtn;
     private javax.swing.JButton Agregar;
     private javax.swing.JButton AgregarServicio;
+    private javax.swing.JButton Atrasbtn;
     private javax.swing.JSpinner CantidadSpinner;
     private javax.swing.JLabel Costo;
     private javax.swing.JTextField Costotext;

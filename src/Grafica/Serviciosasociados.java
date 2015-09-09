@@ -69,14 +69,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
         int cont =0;
         
         lista_productos = nuevo_producto.getLista_servicios_asociados();
-        System.out.println("Prodcuto : " + Producto);
-        System.out.println("Marca : " + Marca);
         
-        System.out.println("----------------------ESTOY LLEGANDO A LA ASOCIACION------------------------------");
-                                for (Object lista_producto : lista_productos) {
-                                    System.out.println("Servicio: " + lista_producto);
-                                }
-       
             
                 
             
@@ -141,24 +134,18 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                 checkBox[i] = new JCheckBox () ;
                                 checkBox [i].setBounds(20,y, 20, 30);
                                 this.add(checkBox[i]);
-                                System.out.println("-----------------------------------------");
-                                System.out.println("Iteracion: " + i);
-                                System.out.println("aux: " + aux);
-                                System.out.println("cont: " + cont);
-                                System.out.println("id servicio:" + id[i] );
                                 
                                 if(aux>0 ){
                                 if (id[i] <=  (int) id2[0][aux-1]){
                                     for (int k = 0; k<aux; k++){
-                                        System.out.println("id servicio asociado: " + id2[0][k]);
                                         if (id [i] == (int ) id2[0][k] ){
                                            checkBox [i].setSelected(true);
+                                           
                                         }        
                                     }
                                 }
                                 }
                                 if(lista_productos.size()>0){
-                                        System.out.println("id que se revisa con la lista: " + id [i]);
                                         if (lista_productos.contains(id [i])){
                                            checkBox [i].setSelected(true);
                                         }        
@@ -187,33 +174,26 @@ public class Serviciosasociados extends javax.swing.JFrame {
                             lista_productos.clear();
                             boolean flag2 = false;
                             int flag = 0;
-                            System.out.println("Esto es F " + f);
                                     for (int j=0; j<f; j++ ){
-                                       System.out.println("Esto es J: " + j);
                                         if ( checkBox[j].isSelected() ){
                                             flag = 1;
-                                            System.out.println("Entre por aqui ");
                                             if (aux > 0){
                                                 if (id[j] <=  (int) id2[0][aux-1]){
                                                     for (int k = 0; k<aux; k++){
                                                         if (id [j] == (int ) id2[0][k]){
                                                             flag = 2 ;
                                                             flag2 = true;
-                                                            System.out.println("Los id " + id[j] + " - " + id2[0][k] + " deben ser iguales.");
                                                         }
                                                     }
                                                 }
                                             }   
                                         }else{
                                             flag = 0;
-                                             System.out.println("estoy seleccionando id: " + id[j] + " para ser borrado.");
                                         }
                                   
-                                        System.out.println("Este es flag : " + flag);
                                             if (flag == 1){
                                                     
                                                 flag2= true;
-                                                    System.out.println("Estoy en el elemento: " + j + "id : " + id[j] );
                                       
                                                     lista_productos.add((int) id[j]);
                                                  
@@ -232,12 +212,11 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                             }
                                  }
                                     
-                            if (flag2){
-                                System.out.println("----------------------YA SALI DE LA ASOCIACION------------------------------");
+                                if (flag2){
                                 for (Object lista_producto : lista_productos) {
                                     System.out.println("Servicio: " + lista_producto);
                                 }
-                                nuevo_producto.setLista_servicios_asociados(lista_productos);
+                                NuevoProducto.setLista_servicios_asociados(lista_productos);
                                 dispose();
                             }else {
                                 JOptionPane.showMessageDialog(null, "Debe seleccionar al menos 1 tipo de servicio. " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
@@ -328,16 +307,11 @@ public class Serviciosasociados extends javax.swing.JFrame {
                              }
                              
                              final int aux = cont;
-                             System.out.println("esto es lo que tiene aux :" + aux);
-                             System.out.println("Cont: " + cont);
-                             System.out.println("F: " + f);
                            
                            int index = 0;
                            if (aux > 0){
                                 for (int i =0; i< f ;i++ ){  
                                     
-                                    System.out.println("Tiempo: " + id2[2][i]);
-                                    System.out.println("Km: " + id2[3][i]);
                                                 
                                     if (id[i] <=  (int) id2[0][aux-1]){
                                         for (int j = 0; j<aux; j++){
@@ -349,11 +323,9 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                                      componentes [i].cantidad.setValue((int) id2[3][j]);
                                                      componentes [i].unidades.setSelectedItem("Km");
                                                 }else{
-                                                    System.out.println(id2[2][j]);
                                                     index =  id2[2][j].toString().indexOf(" Días"); 
 
                                                    if (index >0){
-                                                       System.out.println(id2[2][j].toString().substring(0, index).toString());
                                                        componentes [i].cantidad.setValue(Integer.parseInt(id2[2][j].toString().substring(0, index).toString()));  
 
                                                        componentes [i].unidades.setSelectedItem("Días");  
@@ -387,7 +359,6 @@ public class Serviciosasociados extends javax.swing.JFrame {
                             
                             boolean flag2 = false;
                             int flag = 0;
-                            System.out.println("f : " + f);
                                     String tiempo = "";
                                     for (int j=0; j<f; j++ ){
                                        
@@ -409,10 +380,8 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                                         }else{
                                                             if( (int) componentes [j].cantidad.getValue() != (int) id2[3] [k]){
                                                                 flag = 2;
-                                                                System.out.println("active flag 2");
                                                             }else{
                                                                 flag = 4;
-                                                                System.out.println("active flag 4");
                                                             }
                                                                 
                                                         }
@@ -431,7 +400,6 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                             
                                             if(flag >= 1){
                                                 flag2=true;
-                                                System.out.println("Flag 1: " + flag);
                                                 
                                                 
                                                 switch (flag){
@@ -561,7 +529,6 @@ public class Serviciosasociados extends javax.swing.JFrame {
                             
                             boolean flag2 = false;
                             int flag = 0;
-                            System.out.println("f : " + f);
                                     String tiempo = "";
                                     for (int j=0; j<f; j++ ){
                                        
@@ -577,7 +544,6 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                             
                     if(flag == 1){
 
-                        System.out.println("Flag 1: " + flag);
                         flag2=true;
                         if (flag == 1){
 
@@ -670,8 +636,6 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                     for (int j=1 ; j<=f; j++ ){
                                         if ( checkBox[j-1].isSelected() ){
                                                 try {
-                                                    System.out.println(Rif);
-                                                    System.out.println(j);
                                                     BD.st.execute("INSERT INTO Tipo_Servicio_has_Proveedor VALUES ("+id[j-1]+",'"+Rif+"', '"+Razon_Social+"' ) ; ");
                                                     flag = true;
                                                 } catch (SQLException ex) {
@@ -712,7 +676,6 @@ public class Serviciosasociados extends javax.swing.JFrame {
                     {
                         cont++;
                     }
-                    System.out.println(Rif);
                     final int aux = cont;
                     servicios = new Object [cont];
 
@@ -725,7 +688,6 @@ public class Serviciosasociados extends javax.swing.JFrame {
                      
                         while (rs.next())
                     {   
-                       System.out.println( servicios [cont] = rs.getInt("Tipo_Servicio_idTipo_Servicio"));
                         cont++;
                     }
                             
@@ -800,20 +762,13 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                     
                                     for (int j=0 ; j<f; j++ ){
                                         if ( checkBox[j].isSelected() ){
-                                            System.out.println("j: " + j );
-                                            System.out.println("f: " + f );
-                                            System.out.println(servicios2 [1] [j]);
-                                            System.out.println( servicios [aux-1]);
                                            
                                             
                                             
                                             if ((int) servicios2 [1] [j] <= (int) servicios [aux-1]){
                                                  
                                                 for (int k=0; k<aux ; k++){
-                                                    System.out.println("Id servicios: " + servicios [k]  );
-                                                    System.out.println("Id servicios2: " + servicios2 [1] [j]);
                                                     if ( (int) servicios [k] == (int) servicios2 [1] [j]){
-                                                        System.out.println("entre al if que quieres");
                                                         flag = 0;
                                                      }
                                                 } 
@@ -821,8 +776,6 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                             
                                                          if (flag == 1){
                                                                  try {
-                                                                    System.out.println(Rif);
-                                                                    System.out.println(j);
                                                                     BD.st.execute("INSERT INTO Tipo_Servicio_has_Proveedor VALUES ("+ (int) servicios2 [1] [j] +",'"+Rif+"', '"+Razon_Social+"' )");
                                                                 } catch (SQLException ex) {
                                                                     Logger.getLogger(Serviciosasociados.class.getName()).log(Level.SEVERE, null, ex);
