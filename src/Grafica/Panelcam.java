@@ -248,7 +248,8 @@ public class Panelcam extends JPanel {
                                                         "inner join tipo_servicio_has_automovil " +
                                                         "on idTipo_Servicio = Tipo_Servicio_idTipo_Servicio " +
                                                         "where Automovil_Placa = '" + camion [fila] [0] +"' " +
-                                                        "and Automovil_Model = '" +camion [fila] [1]  +"' ;");
+                                                        "and Automovil_Model = '" +camion [fila] [1]  +"'"
+                                                        + "group by idTipo_Servicio asc ;");
                             
                             rs.beforeFirst();
                             while(rs.next()) {
@@ -308,7 +309,12 @@ public class Panelcam extends JPanel {
                             int y=60;
                             j=0;
                             
+                                
+                                System.out.println("cont: " + cont);
+                                
                             for ( i=0 ; i<cont;i++, j+=2 ){
+                                System.out.println("i: " + i );
+                                System.out.println("j: " + j);
                                 tipo [i] = new JLabel ( tipo_servi.get(j).toString()); 
                                 tipo [i].setBounds(x,y, 200, 30);
                                 pn.add(tipo [i]);

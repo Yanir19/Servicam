@@ -35,7 +35,7 @@ public class NuevoProducto extends javax.swing.JFrame {
     private ResultSet rs = null;
     private boolean acept = true; 
     private int idproducto ;
-    private  static ArrayList lista_servicios_asociados = new ArrayList(); 
+    private static ArrayList lista_servicios_asociados = new ArrayList(); 
     public NuevoProducto() throws SQLException {
         initComponents();
         this.setTitle("Crear un nuevo producto.");
@@ -54,6 +54,16 @@ public class NuevoProducto extends javax.swing.JFrame {
      
      
     }
+
+    
+    public static ArrayList getLista_servicios_asociados() {
+        return lista_servicios_asociados;
+    }
+
+    public static void setLista_servicios_asociados(ArrayList lista_servicios_asociados) {
+        NuevoProducto.lista_servicios_asociados = lista_servicios_asociados;
+    }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -373,9 +383,12 @@ public class NuevoProducto extends javax.swing.JFrame {
         try {
             servi = new Serviciosasociados();
             
-            if ((!Productotext.getText().equals("") && !Marcatext.getText().equals(""))  ){               
-               lista_servicios_asociados  = servi.AgregarProducto (Productotext.getText(), Marcatext.getText(), lista_servicios_asociados );
+            if ((!Productotext.getText().equals("") && !Marcatext.getText().equals(""))  ){    
                 servi.setVisible(true);
+            servi.AgregarProducto (Productotext.getText(), Marcatext.getText(), this );
+                
+                
+                
             }else{
                  JOptionPane.showMessageDialog(null, "Los campos 'Producto' y 'Marca' no pueden estar vacios. "  ,"Informacion", JOptionPane.WARNING_MESSAGE);
             }
@@ -478,6 +491,7 @@ public class NuevoProducto extends javax.swing.JFrame {
                           
                             this.add(Editar);
                             this.add(Agregar);
+                            lista_servicios_asociados.clear();
                             this.getContentPane().remove(Aceptar);
                             repaint();
                             dispose();
@@ -559,6 +573,7 @@ public class NuevoProducto extends javax.swing.JFrame {
                     asociar_producto_tipo_servicio();
            
                     JOptionPane.showMessageDialog(null, "El producto fue creado con exito. " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
+                    lista_servicios_asociados.clear();
                     Productotext.setText("");
                     Marcatext.setText("");
                     Costotext.setText("");
@@ -670,21 +685,18 @@ public class NuevoProducto extends javax.swing.JFrame {
     
     public void asociar_producto_tipo_servicio (){
         
-        
-                Iterator iterador_de_lista  = lista_servicios_asociados.iterator();
+        System.out.println("LLegue a asociar_producto_tipo_servicio ()");
               
-                    while(iterador_de_lista.hasNext()){
-                        try {
-                            manejador_bd.st.execute("INSERT INTO inventario_has_tipo_servicio ( Inventario_Producto, Inventario_Marca, Tipo_Servicio_idTipo_Servicio ) " +
-                                          "SELECT '"+ Productotext.getText()+"' , '"+ Marcatext.getText()+"' ,  "+iterador_de_lista.next()+"  " +
-                                          "FROM dual " +
-                                          "WHERE NOT EXISTS (SELECT * FROM inventario_has_tipo_servicio " +
-                                          "WHERE Inventario_Producto = '"+ Productotext.getText()+"' and Inventario_Marca = '"+ Marcatext.getText()+"' )" );
-                        } catch (SQLException ex) {
-                            Logger.getLogger(NuevoProducto.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-
-                    }
+        for (Object lista_servicios_asociado : lista_servicios_asociados) {
+            try {
+                
+                manejador_bd.st.execute("INSERT INTO inventario_has_tipo_servicio ( Inventario_Producto, Inventario_Marca, Tipo_Servicio_idTipo_Servicio ) " +
+                        "   values ( '"+ Productotext.getText()+"' , '"+ Marcatext.getText()+"' ,  "+lista_servicios_asociado+"   );" );
+                System.out.println("Servicio " + lista_servicios_asociado + " asociado.");
+            } catch (SQLException ex) {
+                Logger.getLogger(NuevoProducto.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
                
     }
     

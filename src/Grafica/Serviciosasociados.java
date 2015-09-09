@@ -63,14 +63,19 @@ public class Serviciosasociados extends javax.swing.JFrame {
     }
     
     @SuppressWarnings("empty-statement")
-    public ArrayList  AgregarProducto ( final String Producto, final String Marca, ArrayList argumento_lista_productos) throws SQLException{
+    public void  AgregarProducto ( final String Producto, final String Marca, final NuevoProducto nuevo_producto) throws SQLException{
         
         
         int cont =0;
-        this.lista_productos = argumento_lista_productos;
+        
+        lista_productos = nuevo_producto.getLista_servicios_asociados();
         System.out.println("Prodcuto : " + Producto);
         System.out.println("Marca : " + Marca);
         
+        System.out.println("----------------------ESTOY LLEGANDO A LA ASOCIACION------------------------------");
+                                for (Object lista_producto : lista_productos) {
+                                    System.out.println("Servicio: " + lista_producto);
+                                }
        
             
                 
@@ -78,7 +83,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
             ResultSet rs = null;
             
             
-                             rs=BD.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " + 
+                             rs=manejador_bd.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " + 
                                     " FROM tipo_servicio ,Inventario_has_Tipo_Servicio as ta"+
                                     " WHERE ta.Inventario_Producto = '"+ Producto  +"' and  ta.Inventario_Marca = '"+ Marca  +"' AND idTipo_Servicio  = ta.Tipo_Servicio_idTipo_Servicio; ");
                             
@@ -90,10 +95,11 @@ public class Serviciosasociados extends javax.swing.JFrame {
                             final Object id2 [] [] = new Object [4] [cont];
                             
                             
-                               rs=BD.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " + 
-                                    " FROM tipo_servicio , Inventario_has_Tipo_Servicio as ta"+
-                                    " WHERE ta.Inventario_Producto = '"+ Producto  +"' and  ta.Inventario_Marca = '"+ Marca  +"' AND idTipo_Servicio  = ta.Tipo_Servicio_idTipo_Servicio; ");
-                               
+                            rs=manejador_bd.st.executeQuery( " SELECT Distinct Tipo_Servicio_idTipo_Servicio, Descripcion " + 
+                                 " FROM tipo_servicio , Inventario_has_Tipo_Servicio as ta"+
+                                 " WHERE ta.Inventario_Producto = '"+ Producto  +"' and  ta.Inventario_Marca = '"+ Marca  +"' AND idTipo_Servicio  = ta.Tipo_Servicio_idTipo_Servicio"
+                                    + "  group by Tipo_Servicio_idTipo_Servicio asc; ");
+
                             rs.beforeFirst();
                             
                              for (cont = 0; rs.next(); cont++){
@@ -106,7 +112,7 @@ public class Serviciosasociados extends javax.swing.JFrame {
                              
                              final int aux = cont;
                              
-                              rs=BD.st.executeQuery("SELECT Descripcion FROM tipo_servicio ;");
+                              rs=manejador_bd.st.executeQuery("SELECT Descripcion FROM tipo_servicio ;");
                               rs.beforeFirst();
                               
                               cont = 0;
@@ -118,7 +124,8 @@ public class Serviciosasociados extends javax.swing.JFrame {
                             final int id []= new int [cont];
                             
                             
-                             rs=BD.st.executeQuery("SELECT idTipo_Servicio, Descripcion FROM tipo_servicio ;");
+                             rs=manejador_bd.st.executeQuery("SELECT idTipo_Servicio, Descripcion FROM tipo_servicio "
+                                     + " group by idTipo_Servicio asc;");
                                 rs.beforeFirst();
 
                             int y= 20;
@@ -127,29 +134,34 @@ public class Serviciosasociados extends javax.swing.JFrame {
                             {
 
                                 tipo [i] = new JLabel (rs.getString("Descripcion"));
-                                 id [i] = rs.getInt("idTipo_Servicio");
+                                id [i] = rs.getInt("idTipo_Servicio");
                                 tipo [i].setBounds(50,y, 200, 30);
                                 this.add(tipo [i]);
                                  
                                 checkBox[i] = new JCheckBox () ;
                                 checkBox [i].setBounds(20,y, 20, 30);
                                 this.add(checkBox[i]);
-                                
+                                System.out.println("-----------------------------------------");
+                                System.out.println("Iteracion: " + i);
+                                System.out.println("aux: " + aux);
+                                System.out.println("cont: " + cont);
+                                System.out.println("id servicio:" + id[i] );
                                 
                                 if(aux>0 ){
                                 if (id[i] <=  (int) id2[0][aux-1]){
                                     for (int k = 0; k<aux; k++){
+                                        System.out.println("id servicio asociado: " + id2[0][k]);
                                         if (id [i] == (int ) id2[0][k] ){
                                            checkBox [i].setSelected(true);
                                         }        
                                     }
                                 }
-                                }else{
-                                    for (int k = 0; k<cont; k++){
+                                }
+                                if(lista_productos.size()>0){
+                                        System.out.println("id que se revisa con la lista: " + id [i]);
                                         if (lista_productos.contains(id [i])){
                                            checkBox [i].setSelected(true);
                                         }        
-                                    }
                                 }
                                 
                                 y+=30;
@@ -186,18 +198,15 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                                     for (int k = 0; k<aux; k++){
                                                         if (id [j] == (int ) id2[0][k]){
                                                             flag = 2 ;
-
+                                                            flag2 = true;
+                                                            System.out.println("Los id " + id[j] + " - " + id2[0][k] + " deben ser iguales.");
                                                         }
-
                                                     }
-
-                                                }else{
-                                                    flag  = 0;
-                                                     System.out.println("Estoy entrando aqui ");
                                                 }
                                             }   
                                         }else{
                                             flag = 0;
+                                             System.out.println("estoy seleccionando id: " + id[j] + " para ser borrado.");
                                         }
                                   
                                         System.out.println("Este es flag : " + flag);
@@ -223,17 +232,22 @@ public class Serviciosasociados extends javax.swing.JFrame {
                                             }
                                  }
                                     
-                            if (flag2)
-                                
-                            dispose();
-                            else {
+                            if (flag2){
+                                System.out.println("----------------------YA SALI DE LA ASOCIACION------------------------------");
+                                for (Object lista_producto : lista_productos) {
+                                    System.out.println("Servicio: " + lista_producto);
+                                }
+                                nuevo_producto.setLista_servicios_asociados(lista_productos);
+                                dispose();
+                            }else {
                                 JOptionPane.showMessageDialog(null, "Debe seleccionar al menos 1 tipo de servicio. " ,"Informacion", JOptionPane.INFORMATION_MESSAGE);
                             }
                         }
                         
                     });
                             
-    return lista_productos;
+                
+                
    }
     
     
